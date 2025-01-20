@@ -9,7 +9,7 @@ namespace BLL.Interfaces
 
         public Task<Publicacion> GetById(int id);
 
-        public Task<Publicacion> Create(PublicacionCreacionDTO publicacion);
+        public Task<PublicacionDTO> Create(PublicacionCreacionDTO publicacion);
 
         public Task<Publicacion> Update(PublicacionEdicionDTO publicacion);
 

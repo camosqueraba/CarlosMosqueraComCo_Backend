@@ -1,0 +1,18 @@
+﻿using DAL.Model.Publicacion;
+
+namespace Repository.Interfaces
+{
+    public interface IPublicacionRepository
+    {        
+        public Task<List<Publicacion>> GetAll();
+
+        public Task<Publicacion> GetById(int id);
+
+        public Task<int> Create(Publicacion publicacion);
+
+        public Task<int> Update(Publicacion publicacion);
+
+        public Task<int> Delete(int id);
+       
+    }
+}

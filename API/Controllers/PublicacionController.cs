@@ -4,6 +4,7 @@ using DAL.DTOs.PublicacionDTOs;
 using DAL.Model;
 using DAL.Model.Publicacion;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -36,7 +37,7 @@ namespace API.Controllers
     
 
         // GET api/<PublicacionesController>/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "ObtenetPublicacionPorId")]
         public string Get(int id)
         {
             return "value";
@@ -47,15 +48,19 @@ namespace API.Controllers
         [ModelStateValidationFilter]
         public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
         {
-            Publicacion result = await PublicacionService.Create(publicacionCreacionDTO);
+            PublicacionDTO publicacion = null;
+            
+            if (ModelState.IsValid)
+            {
+                publicacion = await PublicacionService.Create(publicacionCreacionDTO);                
+            }  
 
-            if (result == null)
+            if (publicacion == null)
             {
                 return BadRequest();
             }
-
-            //return Ok(result);
-            return CreatedAtRoute("GetArriendoHabitacionalById", new { id = result.Id }, result);
+            
+            return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
         }
 
         // PUT api/<PublicacionesController>/5
