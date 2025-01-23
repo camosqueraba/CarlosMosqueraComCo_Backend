@@ -20,16 +20,18 @@ namespace BLL.Services
         public async Task<List<Publicacion>> GetAll()
         {
 
-            var clientes = await PublicacionRepository.GetAll();
+            var publicaciones = await PublicacionRepository.GetAll();
 
-            return clientes;
+            return publicaciones;
         }
 
-        public async Task<Publicacion> GetById(int id)
+        public async Task<PublicacionDTO> GetById(int id)
         {
-            var cliente = await PublicacionRepository.GetById(id);
+            Publicacion publicacion = await PublicacionRepository.GetById(id);
 
-            return cliente;
+            PublicacionDTO publicacionDTO = mapper.Map<PublicacionDTO>(publicacion);
+
+            return publicacionDTO;
         }
 
         public async Task<PublicacionDTO> Create(PublicacionCreacionDTO publicacionCreacionDTO)
@@ -65,38 +67,29 @@ namespace BLL.Services
             return response;
         }
 
-        public async Task<PublicacionDTO> Update(PublicacionEdicionDTO clienteEdicionDTO)
+        public async Task<PublicacionDTO> Update(PublicacionEdicionDTO publicacionEdicionDTO)
         {
             int response;
-            PublicacionDTO clienteDTO;
+            PublicacionDTO publicacionDTO;
             try
-            {
+            {                
+                Publicacion publicacion = mapper.Map<Publicacion>(publicacionEdicionDTO);
+                publicacion.FechaModificacion = DateTime.Now;
 
-                //Publicacion clienteActual = await clienteRepository.GetById(clienteEdicionDTO.Id);
+                response = await PublicacionRepository.Update(publicacion);
 
+                Publicacion publicacionEdited = await PublicacionRepository.GetById(response);
 
-                Publicacion cliente = mapper.Map<Publicacion>(clienteEdicionDTO);
-
-                response = await PublicacionRepository.Update(cliente);
-
-
-                Publicacion clienteEdited = await PublicacionRepository.GetById(response);
-
-                clienteDTO = mapper.Map<PublicacionDTO>(clienteEdited);
+                publicacionDTO = mapper.Map<PublicacionDTO>(publicacionEdited);
             }
             catch (Exception exception)
             {
 
-                throw new Exception(string.Concat("PublicacionService.Update(PublicacionEdicionDTO clienteEdicionDTO) Exception: ", exception.Message));
+                throw new Exception(string.Concat("PublicacionService.Update(PublicacionEdicionDTO publicacionEdicionDTO) Exception: ", exception.Message));
             }
 
-
-            return clienteDTO;
+            return publicacionDTO;
         }
-
-        Task<Publicacion> IPublicacionService.Update(PublicacionEdicionDTO publicacion)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

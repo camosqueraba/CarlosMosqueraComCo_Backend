@@ -8,10 +8,10 @@ namespace Repository.Repositories
 {
     public class PublicacionRepository : IPublicacionRepository
     {
-        private readonly ApplicationDBContext_SQLServer _dbContext;
+        private readonly ApplicationDBContext_SQLServer DBContext;
         public PublicacionRepository(ApplicationDBContext_SQLServer dbContext)
         {
-            _dbContext = dbContext;
+            DBContext = dbContext;
         }
 
         public async Task<int> Create(Publicacion publicacion)
@@ -19,8 +19,8 @@ namespace Repository.Repositories
             int idPublicacionCreated;
             try
             {
-                _dbContext.Add(publicacion);
-                await _dbContext.SaveChangesAsync();
+                DBContext.Add(publicacion);
+                await DBContext.SaveChangesAsync();
                 idPublicacionCreated = publicacion.Id;
             }
             catch (SqlException ex)
@@ -44,14 +44,10 @@ namespace Repository.Repositories
             int response;
             try
             {
+                Publicacion publicacion = await DBContext.Publicaciones.FirstAsync(c => c.Id == id);
 
-                Publicacion publicacion = await _dbContext.Publicaciones.FirstAsync(c => c.Id == id);
-
-
-                _dbContext.Remove(publicacion);
-                response = await _dbContext.SaveChangesAsync();
-
-
+                DBContext.Remove(publicacion);
+                response = await DBContext.SaveChangesAsync();
             }
             catch (SqlException ex)
             {
@@ -70,7 +66,7 @@ namespace Repository.Repositories
 
             try
             {
-                publicacions = await _dbContext.Publicaciones.ToListAsync();
+                publicacions = await DBContext.Publicaciones.ToListAsync();
             }
             catch (SqlException ex)
             {
@@ -92,7 +88,7 @@ namespace Repository.Repositories
             Publicacion publicacion = new Publicacion();
             try
             {
-                publicacion = await _dbContext.Publicaciones.FirstOrDefaultAsync(publicacion => publicacion.Id == id);
+                publicacion = await DBContext.Publicaciones.AsNoTracking().FirstOrDefaultAsync(publicacion => publicacion.Id == id);
             }
             catch (SqlException ex)
             {
@@ -114,18 +110,11 @@ namespace Repository.Repositories
             int response;
             try
             {
-                var existingPublicacion = _dbContext.Publicaciones.Local.SingleOrDefault(c => c.Id == publicacion.Id);
-                if (existingPublicacion != null)
-                {
-                    _dbContext.Entry(existingPublicacion).State = EntityState.Detached;
 
-                    publicacion.FechaCreacion = existingPublicacion.FechaCreacion;
-                    publicacion.FechaModificacion = DateTime.Now;
-                }
-
-                _dbContext.Update(publicacion);
-                await _dbContext.SaveChangesAsync();
+                DBContext.Update(publicacion);
+                await DBContext.SaveChangesAsync();
                 response = publicacion.Id;
+                
             }
             catch (SqlException ex)
             {

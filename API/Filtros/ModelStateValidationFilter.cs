@@ -15,7 +15,7 @@ namespace API.Filtros
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
-                var response = new ApiResponse<string>(false, 400, "error peticion", "", errors);
+                var response = new ApiResponse<string>(false, 400, "error en validaciones de campos", "", errors);
                 context.Result = new BadRequestObjectResult(response);
             }
         }

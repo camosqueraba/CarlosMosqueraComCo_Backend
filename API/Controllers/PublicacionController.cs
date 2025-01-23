@@ -4,8 +4,6 @@ using DAL.DTOs.PublicacionDTOs;
 using DAL.Model;
 using DAL.Model.Publicacion;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System.Collections.Generic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,10 +25,7 @@ namespace API.Controllers
         {
             List<Publicacion> publicaciones = await PublicacionService.GetAll();
 
-            string titulo = "registros encontrados";
-
-            if (publicaciones.Count == 0)
-                titulo = "no se encontraron registros";
+            string titulo = publicaciones.Count > 0 ? "registros encontrados" : "no se encontraron registros";                       
 
             return Ok(new ApiResponse<List<Publicacion>>(true, 200, titulo, publicaciones, null));
         }
@@ -38,10 +33,24 @@ namespace API.Controllers
 
         // GET api/<PublicacionesController>/5
         [HttpGet("{id}", Name = "ObtenetPublicacionPorId")]
-        public string Get(int id)
+        public async Task<ActionResult<PublicacionDTO>> Get(int id)
         {
-            return "value";
+            string titulo = "";
+            int status_code = 0;
+
+            PublicacionDTO publicacion = await PublicacionService.GetById(id);
+            
+            if (publicacion is null)
+            {
+                titulo = "registro no encontrado";
+                status_code = 404;
+
+                return NotFound(new ApiResponse<PublicacionDTO>(true, status_code, titulo, null, null));
+            }            
+
+            return Ok(new ApiResponse<PublicacionDTO>(true, 200, titulo, publicacion, null));
         }
+                
 
         // POST api/<PublicacionesController>
         [HttpPost]
@@ -63,16 +72,66 @@ namespace API.Controllers
             return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
         }
 
+
         // PUT api/<PublicacionesController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Put(int id, [FromBody] PublicacionEdicionDTO publicacionEdicion)
         {
+            string titulo = "";
+            int status_code = 0;
+
+            PublicacionDTO publicacionActual = await PublicacionService.GetById(id);
+            PublicacionDTO publicacionEditada;
+
+            if (publicacionActual is null)
+            {
+                titulo = "registro no encontrado";
+                status_code = 404;
+
+                return NotFound(new ApiResponse<Publicacion>(true, status_code, titulo, null, null));
+            }
+            else
+            {
+                publicacionEdicion.Id = publicacionActual.Id;
+                publicacionEdicion.FechaCreacion = publicacionActual.FechaCreacion;
+                
+                publicacionEditada = await PublicacionService.Update(publicacionEdicion);
+                titulo = "publicacion editada";
+                status_code = 200;
+            }
+
+            return Ok(new ApiResponse<PublicacionDTO>(true, status_code, titulo, publicacionEditada, null));
         }
+
 
         // DELETE api/<PublicacionesController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Delete(int id)
         {
+            string titulo = "";
+            int status_code = 0;
+
+            PublicacionDTO publicacionActual = await PublicacionService.GetById(id);
+            
+            if (publicacionActual is null)
+            {
+                titulo = "registro no encontrado";
+                status_code = 404;
+
+                return NotFound(new ApiResponse<Publicacion>(true, status_code, titulo, null, null));
+            }
+            else
+            {                
+                int result = await PublicacionService.Delete(id);
+                if(result > 0)
+                {
+                    titulo = "publicacion eliminada";
+                    status_code = 204;
+                }
+                
+            }
+
+            return Ok(new ApiResponse<PublicacionDTO>(true, status_code, titulo, null, null));
         }
     }
 }
