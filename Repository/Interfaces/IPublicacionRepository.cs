@@ -1,4 +1,4 @@
-﻿using DAL.Model.Publicacion;
+﻿using DAL.Model;
 
 namespace Repository.Interfaces
 {
@@ -12,7 +12,6 @@ namespace Repository.Interfaces
 
         public Task<int> Update(Publicacion publicacion);
 
-        public Task<int> Delete(int id);
-       
+        public Task<int> Delete(int id);       
     }
 }

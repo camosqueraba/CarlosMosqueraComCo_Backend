@@ -1,4 +1,4 @@
-﻿using DAL.Model.Publicacion;
+﻿using DAL.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repository.DataContext
@@ -11,5 +11,6 @@ namespace Repository.DataContext
         }
 
         public DbSet<Publicacion> Publicaciones { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace DAL.DTOs.PublicacionDTOs
 
         [Display(Name = "descripcion")]
         [Required(ErrorMessage = "el campo {0} es requerido")]
-        public string Descripcion { get; set; }
+        public string Contenido { get; set; }
 
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaModificacion { get; set; }

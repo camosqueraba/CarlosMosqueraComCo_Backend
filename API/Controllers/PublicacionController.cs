@@ -2,7 +2,6 @@
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
 using DAL.Model;
-using DAL.Model.Publicacion;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

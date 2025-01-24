@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using DAL.DTOs.ComentarioDTOs;
 using DAL.DTOs.PublicacionDTOs;
-using DAL.Model.Publicacion;
+using DAL.Model;
 
 namespace DAL.Utilities
 {
@@ -12,18 +13,9 @@ namespace DAL.Utilities
             CreateMap<PublicacionEdicionDTO, Publicacion>();
             CreateMap<Publicacion, PublicacionDTO>();
 
-            /*
-            CreateMap<CuentaCreacionDTO, Cuenta>();
-            CreateMap<CuentaEdicionDTO, Cuenta>();
-            CreateMap<Cuenta, CuentaDTO>();
-
-
-            CreateMap<TransaccionCreacionDTO, Transaccion>();
-            CreateMap<TransaccionCreacionTransferenciaDTO, Transaccion>();
-            //CreateMap<TransaccionEdicionDTO, Transaccion>();
-            CreateMap<Transaccion, TransaccionDTO>();
-            */
-
+            CreateMap<ComentarioCreacionDTO, Comentario>();
+            CreateMap<ComentarioEdicionDTO, Comentario>();
+            CreateMap<Comentario, ComentarioDTO>();            
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
-using DAL.Model.Publicacion;
+using DAL.Model;
 using Repository.Interfaces;
 
 namespace BLL.Services
@@ -42,9 +42,8 @@ namespace BLL.Services
             {
                 Publicacion publicacion = mapper.Map<Publicacion>(publicacionCreacionDTO);
 
-                publicacion.FechaCreacion = DateTime.Now;
-                publicacion.FechaModificacion = DateTime.Now;
-
+                publicacion.FechaCreacion = publicacion.FechaModificacion = DateTime.Now;
+                
                 response = await PublicacionRepository.Create(publicacion);
 
                 resultPublicacionDTO = mapper.Map<PublicacionDTO>(publicacion);

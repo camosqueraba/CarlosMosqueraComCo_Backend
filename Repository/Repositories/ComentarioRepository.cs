@@ -1,4 +1,9 @@
-﻿using DAL.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DAL.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;
@@ -6,22 +11,22 @@ using Repository.Interfaces;
 
 namespace Repository.Repositories
 {
-    public class PublicacionRepository : IPublicacionRepository
+    public class ComentarioRepository : IComentarioRepository
     {
         private readonly ApplicationDBContext_SQLServer DBContext;
-        public PublicacionRepository(ApplicationDBContext_SQLServer dbContext)
+        public ComentarioRepository(ApplicationDBContext_SQLServer dbContext)
         {
             DBContext = dbContext;
         }
 
-        public async Task<int> Create(Publicacion publicacion)
+        public async Task<int> Create(Comentario comentario)
         {
-            int idPublicacionCreated;
+            int idComentarioCreated;
             try
             {
-                DBContext.Add(publicacion);
+                DBContext.Add(comentario);
                 await DBContext.SaveChangesAsync();
-                idPublicacionCreated = publicacion.Id;
+                idComentarioCreated = comentario.Id;
             }
             catch (SqlException ex)
             {
@@ -31,11 +36,11 @@ namespace Repository.Repositories
             catch (Exception ex)
             {
 
-                throw new Exception(string.Concat("PublicacionRepository.Create(Publicacion publicacion) Exception: ", ex.Message));
+                throw new Exception(string.Concat("ComentarioRepository.Create(Comentario comentario) Exception: ", ex.Message));
 
             }
 
-            return idPublicacionCreated;
+            return idComentarioCreated;
         }
 
 
@@ -44,9 +49,9 @@ namespace Repository.Repositories
             int response;
             try
             {
-                Publicacion publicacion = await DBContext.Publicaciones.FirstAsync(c => c.Id == id);
+                Comentario comentario = await DBContext.Comentarios.FirstAsync(c => c.Id == id);
 
-                DBContext.Remove(publicacion);
+                DBContext.Remove(comentario);
                 response = await DBContext.SaveChangesAsync();
             }
             catch (SqlException ex)
@@ -60,35 +65,35 @@ namespace Repository.Repositories
             return response;
         }
 
-        public async Task<List<Publicacion>> GetAll()
+        public async Task<List<Comentario>> GetAll()
         {
-            List<Publicacion> publicacions = null;
+            List<Comentario> comentarios = null;
 
             try
             {
-                publicacions = await DBContext.Publicaciones.ToListAsync();
+                comentarios = await DBContext.Comentarios.ToListAsync();
             }
             catch (SqlException ex)
             {
 
-                throw new Exception(string.Concat("PublicacionRepository.GetAll(Publicacion publicacion) Exception: ", ex.Message));
+                throw new Exception(string.Concat("ComentarioRepository.GetAll(Comentario comentario) Exception: ", ex.Message));
             }
             catch (Exception ex)
             {
 
-                throw new Exception(string.Concat("PublicacionRepository.GetAll(Publicacion publicacion) Exception: ", ex.Message));
+                throw new Exception(string.Concat("ComentarioRepository.GetAll(Comentario comentario) Exception: ", ex.Message));
             }
 
 
-            return publicacions;
+            return comentarios;
         }
 
-        public async Task<Publicacion> GetById(int id)
+        public async Task<Comentario> GetById(int id)
         {
-            Publicacion publicacion = new Publicacion();
+            Comentario comentario = new Comentario();
             try
             {
-                publicacion = await DBContext.Publicaciones.AsNoTracking().FirstOrDefaultAsync(publicacion => publicacion.Id == id);
+                comentario = await DBContext.Comentarios.AsNoTracking().FirstOrDefaultAsync(comentario => comentario.Id == id);
             }
             catch (SqlException ex)
             {
@@ -101,41 +106,41 @@ namespace Repository.Repositories
                 throw new Exception(string.Concat("GetById() Exception: ", ex.Message));
             }
 
-            return publicacion;
+            return comentario;
         }
 
 
-        public async Task<int> Update(Publicacion publicacion)
+        public async Task<int> Update(Comentario comentario)
         {
             int response;
             try
             {
 
-                DBContext.Update(publicacion);
+                DBContext.Update(comentario);
                 await DBContext.SaveChangesAsync();
-                response = publicacion.Id;
-                
+                response = comentario.Id;
+
             }
             catch (SqlException ex)
             {
 
-                throw new Exception(string.Concat("PublicacionRepository.Update(Publicacion publicacion) Exception: ", ex.Message));
+                throw new Exception(string.Concat("ComentarioRepository.Update(Comentario comentario) Exception: ", ex.Message));
             }
             catch (Exception ex)
             {
 
-                throw new Exception(string.Concat("PublicacionRepository.Update(Publicacion publicacion) Exception: ", ex.Message));
+                throw new Exception(string.Concat("ComentarioRepository.Update(Comentario comentario) Exception: ", ex.Message));
             }
 
             return response;
         }
 
 
-        //public async Task<List<Publicacion>> GetPublicacionsDetalle()
+        //public async Task<List<Comentario>> GetComentariosDetalle()
         //{
         //    var connectionString = _dbContext.Database.GetConnectionString();
 
-        //    List<Publicacion> publicacionsDetalle = new();
+        //    List<Comentario> comentariosDetalle = new();
 
 
         //    using (SqlConnection _SqlConnection = new(connectionString))
@@ -146,7 +151,7 @@ namespace Repository.Repositories
         //            {
         //                await _SqlConnection.OpenAsync();
 
-        //                SqlCommand _SqlCommand = new("dbo.SPGetDetallePublicacions", _SqlConnection)
+        //                SqlCommand _SqlCommand = new("dbo.SPGetDetalleComentarios", _SqlConnection)
         //                {
         //                    CommandType = CommandType.StoredProcedure
         //                };
@@ -157,7 +162,7 @@ namespace Repository.Repositories
         //                {
         //                    while (await _SqlDataReader.ReadAsync())
         //                    {
-        //                        publicacionsDetalle.Add(new Publicacion()
+        //                        comentariosDetalle.Add(new Comentario()
         //                        {
         //                            //Id = _SqlDataReader.GetInt32(0),
         //                            Id = _SqlDataReader.GetInt32(0),
@@ -179,7 +184,7 @@ namespace Repository.Repositories
         //            }
         //            catch (Exception exception)
         //            {
-        //                throw new Exception(string.Concat("GetPublicacionsDetalle() Exception: ", exception.Message));
+        //                throw new Exception(string.Concat("GetComentariosDetalle() Exception: ", exception.Message));
         //            }
         //        }
         //        finally
@@ -187,7 +192,7 @@ namespace Repository.Repositories
         //            await _SqlConnection.CloseAsync();
         //            await _SqlConnection.DisposeAsync();
         //        }
-        //        return publicacionsDetalle;
+        //        return comentariosDetalle;
         //    }
 
         //}
