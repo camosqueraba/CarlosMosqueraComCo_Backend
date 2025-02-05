@@ -12,6 +12,7 @@ namespace DAL.Utilities
             CreateMap<PublicacionCreacionDTO, Publicacion>();
             CreateMap<PublicacionEdicionDTO, Publicacion>();
             CreateMap<Publicacion, PublicacionDTO>();
+            CreateMap<Publicacion, PublicacionDetalleDTO>();
 
             CreateMap<ComentarioCreacionDTO, Comentario>();
             CreateMap<ComentarioEdicionDTO, Comentario>();

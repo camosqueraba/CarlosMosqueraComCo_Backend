@@ -10,8 +10,8 @@ namespace BLL.Interfaces
 {
     public interface IComentarioService
     {
-        public Task<List<Comentario>> GetAll();
-
+        public Task<List<ComentarioDTO>> GetAll();
+        public Task<List<ComentarioDTO>> GetComentariosPorPublicacionId(int idPublicacion);
         public Task<ComentarioDTO> GetById(int id);
 
         public Task<ComentarioDTO> Create(ComentarioCreacionDTO comentario);
@@ -19,5 +19,7 @@ namespace BLL.Interfaces
         public Task<ComentarioDTO> Update(ComentarioEdicionDTO comentario);
 
         public Task<int> Delete(int id);
+
+        public Task<bool> ExisteComentario(int id);
     }
 }

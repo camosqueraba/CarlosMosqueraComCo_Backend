@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Azure;
 using DAL.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -135,6 +136,28 @@ namespace Repository.Repositories
             return response;
         }
 
+
+        public async Task<bool> ExisteComentario(int id)
+        {
+            bool existeComentario;
+            try
+            {
+                bool result = await DBContext.Comentarios.AsNoTracking().AnyAsync(x => x.Id == id);
+                existeComentario = result;
+            }
+            catch (SqlException ex)
+            {
+
+                throw new Exception(string.Concat("ComentarioRepository.ExisteComentario(int id) Exception: ", ex.Message));
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(string.Concat("ComentarioRepository.ExisteComentario(int id) Exception: ", ex.Message));
+            }
+
+            return existeComentario;
+        }
 
         //public async Task<List<Comentario>> GetComentariosDetalle()
         //{

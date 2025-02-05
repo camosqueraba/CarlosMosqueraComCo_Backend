@@ -8,6 +8,7 @@ using BLL.Interfaces;
 using DAL.DTOs.ComentarioDTOs;
 using DAL.Model;
 using Repository.Interfaces;
+using Repository.Repositories;
 
 namespace BLL.Services
 {
@@ -22,12 +23,16 @@ namespace BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<Comentario>> GetAll()
+        public async Task<List<ComentarioDTO>> GetAll()
         {
+            var comentarios = await ComentarioRepository.GetAll();
+            List<ComentarioDTO> comentariosDTO = mapper.Map<List<ComentarioDTO>>(comentarios);
+            return comentariosDTO;
+        }
 
-            var comentarioes = await ComentarioRepository.GetAll();
-
-            return comentarioes;
+        public Task<List<ComentarioDTO>> GetComentariosPorPublicacionId(int idPublicacion)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ComentarioDTO> GetById(int id)
@@ -93,5 +98,12 @@ namespace BLL.Services
 
             return comentarioDTO;
         }
+
+        public async Task<bool> ExisteComentario(int id)
+        {
+            bool existeComentario = await ComentarioRepository.ExisteComentario(id);
+
+            return existeComentario;
+        }        
     }
 }

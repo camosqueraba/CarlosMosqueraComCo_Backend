@@ -8,32 +8,55 @@ using Microsoft.AspNetCore.Mvc;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace API.Controllers
-{
-    [Route("api/comentario")]
+{    
     [ApiController]
+    [Route("api/v1.0/comentarios/{publicacionId:int}")]
     public class ComentarioController : ControllerBase
     {
         private readonly IComentarioService ComentarioService;
-        public ComentarioController(IComentarioService comentarioService)
+        private readonly IPublicacionService PublicacionService;
+        public ComentarioController(IComentarioService comentarioService, IPublicacionService publicacionService)
         {
             ComentarioService = comentarioService;
+            PublicacionService = publicacionService;
         }
 
         // GET: api/<ComentarioesController>
         [HttpGet]
         public async Task<ActionResult<List<Comentario>>> Get()
         {
-            List<Comentario> comentarioes = await ComentarioService.GetAll();
+            List<ComentarioDTO> comentarios = await ComentarioService.GetAll();
 
-            string titulo = comentarioes.Count > 0 ? "registros encontrados" : "no se encontraron registros";
+            string titulo = comentarios.Count > 0 ? "registros encontrados" : "no se encontraron registros";
 
-            return Ok(new ApiResponse<List<Comentario>>(true, 200, titulo, comentarioes, null));
+            return Ok(new ApiResponse<List<ComentarioDTO>>(true, 200, titulo, comentarios, null));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Comentario>>> Get(int idPublicacion)
+        {
+            List<ComentarioDTO> comentarios = [];
+            bool existePublicacion = await PublicacionService.ExistePublicacion(idPublicacion);
+
+            if (existePublicacion)
+            {
+                comentarios = await ComentarioService.GetComentariosPorPublicacionId(idPublicacion);
+            }
+            else
+            {
+                return BadRequest(new ApiResponse<List<ComentarioDTO>>(false, 400, "publicacion no existe", comentarios, null));
+            }
+            //List<Comentario> comentarios = await ComentarioService.GetAll();
+
+            string titulo = comentarios.Count > 0 ? "registros encontrados" : "no se encontraron registros";
+
+            return Ok(new ApiResponse<List<ComentarioDTO>>(true, 200, titulo, comentarios, null));
         }
 
 
         // GET api/<ComentarioesController>/5
         [HttpGet("{id}", Name = "ObtenetComentarioPorId")]
-        public async Task<ActionResult<ComentarioDTO>> Get(int id)
+        public async Task<ActionResult<ComentarioDTO>> GetById(int id)
         {
             string titulo = "";
             int status_code = 0;
@@ -45,7 +68,7 @@ namespace API.Controllers
                 titulo = "registro no encontrado";
                 status_code = 404;
 
-                return NotFound(new ApiResponse<ComentarioDTO>(true, status_code, titulo, null, null));
+                return NotFound(new ApiResponse<ComentarioDTO>(false, status_code, titulo, null, null));
             }
 
             return Ok(new ApiResponse<ComentarioDTO>(true, 200, titulo, comentario, null));
@@ -61,8 +84,19 @@ namespace API.Controllers
 
             if (ModelState.IsValid)
             {
+                int idPublicacion = comentarioCreacionDTO.PublicacionId;
 
-                comentario = await ComentarioService.Create(comentarioCreacionDTO);
+                bool existePublicacion = await PublicacionService.ExistePublicacion(idPublicacion);
+
+                if (existePublicacion)
+                {
+                    comentario = await ComentarioService.Create(comentarioCreacionDTO);
+                }
+                else
+                {
+                    return BadRequest(new ApiResponse<ComentarioDTO>(false, 400, "publicacion no existe", comentario, null));
+                }
+                
             }
 
             if (comentario == null)
@@ -89,7 +123,7 @@ namespace API.Controllers
                 titulo = "registro no encontrado";
                 status_code = 404;
 
-                return NotFound(new ApiResponse<Comentario>(true, status_code, titulo, null, null));
+                return NotFound(new ApiResponse<Comentario>(false, status_code, titulo, null, null));
             }
             else
             {
@@ -119,7 +153,7 @@ namespace API.Controllers
                 titulo = "registro no encontrado";
                 status_code = 404;
 
-                return NotFound(new ApiResponse<Comentario>(true, status_code, titulo, null, null));
+                return NotFound(new ApiResponse<Comentario>(false, status_code, titulo, null, null));
             }
             else
             {

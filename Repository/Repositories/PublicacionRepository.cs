@@ -13,10 +13,11 @@ namespace Repository.Repositories
         {
             DBContext = dbContext;
         }
-
+        /*
         public async Task<int> Create(Publicacion publicacion)
         {
             int idPublicacionCreated;
+            Oper
             try
             {
                 DBContext.Add(publicacion);
@@ -36,6 +37,37 @@ namespace Repository.Repositories
             }
 
             return idPublicacionCreated;
+        }
+        */
+        public async Task<ResultadoOperacion<int>> Create(Publicacion publicacion)
+        {
+            int idPublicacionCreated;
+            ResultadoOperacion<int> resultadoOperacion = new();
+            try
+            {
+                DBContext.Add(publicacion);
+                await DBContext.SaveChangesAsync();
+
+                resultadoOperacion.OperacionCompletada = true;
+                resultadoOperacion.DatosResultado = publicacion.Id;
+
+                /*
+                resultadoOperacion = new ResultadoOperacion<int>()
+                {
+                    OperacionCompletada = true,
+                    DatosResultado = publicacion.Id,
+
+                };
+                */
+            }
+            catch (Exception ex)
+            {
+                resultadoOperacion.OperacionCompletada = false;
+                resultadoOperacion.Origen = "PublicacionRepository.Create";
+                resultadoOperacion.Error = ex.Message;
+            }
+
+            return resultadoOperacion;
         }
 
 
@@ -130,6 +162,28 @@ namespace Repository.Repositories
             return response;
         }
 
+
+        public async Task<bool> ExistePublicacion(int id)
+        {
+            bool existePublicacion;
+            try
+            {
+                bool result = await DBContext.Publicaciones.AsNoTracking().AnyAsync(x => x.Id == id);
+                existePublicacion = result;
+            }
+            catch (SqlException ex)
+            {
+
+                throw new Exception(string.Concat("PublicacionRepository.ExistePublicacion(int id) Exception: ", ex.Message));
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(string.Concat("PublicacionRepository.ExistePublicacion(int id) Exception: ", ex.Message));
+            }
+
+            return existePublicacion;
+        }
 
         //public async Task<List<Publicacion>> GetPublicacionsDetalle()
         //{
