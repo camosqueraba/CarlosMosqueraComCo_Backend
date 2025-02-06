@@ -20,5 +20,7 @@ namespace Repository.Interfaces
         public Task<int> Delete(int id);
 
         public Task<bool> ExisteComentario(int id);
+
+        public Task<List<Comentario>> GetComentariosPorIdPublicacion(int idPublicacion);
     }
 }

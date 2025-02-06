@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {    
     [ApiController]
-    [Route("api/v1.0/comentarios/{publicacionId:int}")]
+    [Route("api/v1.0/publicaciones/{idPublicacion:int}/comentarios")]
     public class ComentarioController : ControllerBase
     {
         private readonly IComentarioService ComentarioService;
@@ -22,15 +22,15 @@ namespace API.Controllers
         }
 
         // GET: api/<ComentarioesController>
-        [HttpGet]
-        public async Task<ActionResult<List<Comentario>>> Get()
-        {
-            List<ComentarioDTO> comentarios = await ComentarioService.GetAll();
+        //[HttpGet]
+        //public async Task<ActionResult<List<Comentario>>> Get()
+        //{
+        //    List<ComentarioDTO> comentarios = await ComentarioService.GetAll();
 
-            string titulo = comentarios.Count > 0 ? "registros encontrados" : "no se encontraron registros";
+        //    string titulo = comentarios.Count > 0 ? "registros encontrados" : "no se encontraron registros";
 
-            return Ok(new ApiResponse<List<ComentarioDTO>>(true, 200, titulo, comentarios, null));
-        }
+        //    return Ok(new ApiResponse<List<ComentarioDTO>>(true, 200, titulo, comentarios, null));
+        //}
 
         [HttpGet]
         public async Task<ActionResult<List<Comentario>>> Get(int idPublicacion)
@@ -40,14 +40,13 @@ namespace API.Controllers
 
             if (existePublicacion)
             {
-                comentarios = await ComentarioService.GetComentariosPorPublicacionId(idPublicacion);
+                comentarios = await ComentarioService.GetComentariosPorIdPublicacion(idPublicacion);
             }
             else
             {
                 return BadRequest(new ApiResponse<List<ComentarioDTO>>(false, 400, "publicacion no existe", comentarios, null));
             }
-            //List<Comentario> comentarios = await ComentarioService.GetAll();
-
+            
             string titulo = comentarios.Count > 0 ? "registros encontrados" : "no se encontraron registros";
 
             return Ok(new ApiResponse<List<ComentarioDTO>>(true, 200, titulo, comentarios, null));
@@ -78,19 +77,20 @@ namespace API.Controllers
         // POST api/<ComentarioesController>
         [HttpPost]
         [ModelStateValidationFilter]
-        public async Task<ActionResult<ApiResponse<ComentarioDTO>>> Post([FromBody] ComentarioCreacionDTO comentarioCreacionDTO)
+        public async Task<ActionResult<ApiResponse<ComentarioDTO>>> Post(int idPublicacion, [FromBody] ComentarioCreacionDTO comentarioCreacionDTO)
         {
             ComentarioDTO comentario = null;
+            ComentarioCreacionParaServiceDTO comentarioCreacionParaServiceDTO = new();
 
             if (ModelState.IsValid)
             {
-                int idPublicacion = comentarioCreacionDTO.PublicacionId;
-
                 bool existePublicacion = await PublicacionService.ExistePublicacion(idPublicacion);
 
                 if (existePublicacion)
                 {
-                    comentario = await ComentarioService.Create(comentarioCreacionDTO);
+                    comentarioCreacionParaServiceDTO.PublicacionId = idPublicacion;
+                    comentarioCreacionParaServiceDTO.Contenido = comentarioCreacionDTO.Contenido;
+                    comentario = await ComentarioService.Create(comentarioCreacionParaServiceDTO);
                 }
                 else
                 {
@@ -104,7 +104,7 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtRoute("ObtenetComentarioPorId", new { id = comentario.Id }, new ApiResponse<ComentarioDTO>(true, 201, "recurso creado", comentario, null));
+            return CreatedAtRoute("ObtenetComentarioPorId", new { id = comentario.Id, idPublicacion }, new ApiResponse<ComentarioDTO>(true, 201, "recurso creado", comentario, null));
         }
 
 

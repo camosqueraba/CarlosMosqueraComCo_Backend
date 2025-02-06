@@ -30,9 +30,11 @@ namespace BLL.Services
             return comentariosDTO;
         }
 
-        public Task<List<ComentarioDTO>> GetComentariosPorPublicacionId(int idPublicacion)
+        public async Task<List<ComentarioDTO>> GetComentariosPorIdPublicacion(int idPublicacion)
         {
-            throw new NotImplementedException();
+            List<Comentario> comentarios = await ComentarioRepository.GetAll();
+            List<ComentarioDTO> comentariosDTO = mapper.Map<List<ComentarioDTO>>(comentarios);
+            return comentariosDTO;
         }
 
         public async Task<ComentarioDTO> GetById(int id)
@@ -44,7 +46,7 @@ namespace BLL.Services
             return comentarioDTO;
         }
 
-        public async Task<ComentarioDTO> Create(ComentarioCreacionDTO comentarioCreacionDTO)
+        public async Task<ComentarioDTO> Create(ComentarioCreacionParaServiceDTO comentarioCreacionDTO)
         {
             ComentarioDTO resultComentarioDTO;
             int response;

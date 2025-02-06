@@ -15,8 +15,7 @@
             StatusCode = statusCode;
             Title = title;
             Data = data;
-            Errores = erroresValidacion;
-            
+            Errores = erroresValidacion;            
         }
     }
 }

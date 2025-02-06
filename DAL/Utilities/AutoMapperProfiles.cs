@@ -16,7 +16,8 @@ namespace DAL.Utilities
 
             CreateMap<ComentarioCreacionDTO, Comentario>();
             CreateMap<ComentarioEdicionDTO, Comentario>();
-            CreateMap<Comentario, ComentarioDTO>();            
+            CreateMap<Comentario, ComentarioDTO>();
+            CreateMap<ComentarioCreacionParaServiceDTO, Comentario>();
         }
     }
 }

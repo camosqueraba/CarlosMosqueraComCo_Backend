@@ -10,12 +10,8 @@ namespace DAL.DTOs.ComentarioDTOs
     public class ComentarioCreacionDTO
     {       
 
-        [Display(Name = "descripcion")]
+        [Display(Name = "contenido")]
         [Required(ErrorMessage = "el campo {0} es requerido")]
-        public string Contenido { get; set; }
-
-        [Display(Name = "publicacion id")]
-        [Required(ErrorMessage = "el campo {0} es requerido")]
-        public int PublicacionId { get; set; }
+        public string Contenido { get; set; }        
     }
 }

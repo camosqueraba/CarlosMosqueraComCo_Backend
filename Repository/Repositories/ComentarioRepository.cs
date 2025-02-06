@@ -159,6 +159,21 @@ namespace Repository.Repositories
             return existeComentario;
         }
 
+        public async Task<List<Comentario>> GetComentariosPorIdPublicacion(int idPublicacion)
+        {
+            try
+            {
+                List<Comentario> comentarios = [];
+                comentarios = await DBContext.Comentarios.Where(c => c.PublicacionId == idPublicacion).ToListAsync();
+                return comentarios;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         //public async Task<List<Comentario>> GetComentariosDetalle()
         //{
         //    var connectionString = _dbContext.Database.GetConnectionString();
