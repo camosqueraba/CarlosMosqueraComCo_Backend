@@ -7,7 +7,7 @@ using Repository.Repositories;
 
 namespace BLL.Services
 {
-    public class PublicacionService : IPublicacionService
+    public class PublicacionService : IPublicacionService, IPublicacionCustomRepository
     {
         private readonly IPublicacionRepository PublicacionRepository;
         private readonly IMapper mapper;
@@ -26,12 +26,38 @@ namespace BLL.Services
             return publicacionesDTO;
         }
 
-        public async Task<PublicacionDetalleDTO> GetById(int id)
+        public async Task<ResultadoOperacion<PublicacionDetalleDTO>> GetById(int id)
         {
-            Publicacion publicacion = await PublicacionRepository.GetById(id);
-            PublicacionDetalleDTO publicacionDetalleDTO = mapper.Map<PublicacionDetalleDTO>(publicacion);
+            ResultadoOperacion<PublicacionDetalleDTO> resultadoOperacionService = new();
+            try
+            {                
+                ResultadoOperacion<Publicacion> resultadoOperacionRepository;
+                resultadoOperacionRepository = await PublicacionRepository.GetById(id);
 
-            return publicacionDetalleDTO;
+                if (resultadoOperacionRepository != null && resultadoOperacionRepository.OperacionCompletada == true)
+                {
+                    resultadoOperacionService.DatosResultado = mapper.Map<PublicacionDetalleDTO>(resultadoOperacionRepository.DatosResultado);
+                    resultadoOperacionService.OperacionCompletada = true;
+                    //resultadoOperacionService.DatosResultado = resultPublicacionDTO;
+                }
+                else
+                {
+                    resultadoOperacionService.OperacionCompletada = false;
+                    resultadoOperacionService.DatosResultado = null;
+                    resultadoOperacionService.Origen = resultadoOperacionRepository.Origen;
+                    resultadoOperacionService.Error = resultadoOperacionRepository.Error;
+                }
+                //Publicacion publicacion = await PublicacionRepository.GetById(id);
+                //PublicacionDetalleDTO publicacionDetalleDTO = mapper.Map<PublicacionDetalleDTO>(publicacion);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
+
+            return resultadoOperacionService;
         }
         /*
         public async Task<PublicacionDTO> Create(PublicacionCreacionDTO publicacionCreacionDTO)
@@ -96,9 +122,9 @@ namespace BLL.Services
             return resultadoOperacionService;
         }
 
-        public async Task<int> Delete(int id)
+        public async Task<ResultadoOperacion<int>> Delete(int id)
         {
-            int response;
+            ResultadoOperacion<int> response;
 
             response = await PublicacionRepository.Delete(id);
 
@@ -116,8 +142,9 @@ namespace BLL.Services
 
                 response = await PublicacionRepository.Update(publicacion);
 
-                Publicacion publicacionEdited = await PublicacionRepository.GetById(response);
-
+                Publicacion publicacionEdited;
+                ResultadoOperacion<Publicacion> resultadoOperacion = await PublicacionRepository.GetById(response);
+                publicacionEdited = resultadoOperacion.DatosResultado;
                 publicacionDTO = mapper.Map<PublicacionDTO>(publicacionEdited);
             }
             catch (Exception exception)

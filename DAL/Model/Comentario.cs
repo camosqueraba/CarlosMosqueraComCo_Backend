@@ -17,6 +17,6 @@ namespace DAL.Model
         public DateTime FechaModificacion { get; set; }
         [Required]
         public int PublicacionId { get; set; }
-        public Publicacion? Publicacion { get; set; }
+        //public Publicacion? Publicacion { get; set; }
     }
 }

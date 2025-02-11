@@ -54,13 +54,24 @@ namespace API.Controllers
 
 
         // GET api/<ComentarioesController>/5
-        [HttpGet("{id}", Name = "ObtenetComentarioPorId")]
-        public async Task<ActionResult<ComentarioDTO>> GetById(int id)
+        [HttpGet("{idComentario}", Name = "ObtenerComentarioPorId")]
+        public async Task<ActionResult<ComentarioDTO>> GetById([FromRoute] int idPublicacion, [FromRoute]int idComentario )
         {
             string titulo = "";
             int status_code = 0;
 
-            ComentarioDTO comentario = await ComentarioService.GetById(id);
+            ComentarioDTO comentario = null;
+
+            bool existePublicacion = await PublicacionService.ExistePublicacion(idPublicacion);
+
+            if (existePublicacion)
+            {
+                comentario = await ComentarioService.GetById(idComentario);
+            }
+            else
+            {
+                return BadRequest(new ApiResponse<ComentarioDTO>(false, 400, "publicacion no existe", null, null));
+            }
 
             if (comentario is null)
             {
@@ -77,7 +88,7 @@ namespace API.Controllers
         // POST api/<ComentarioesController>
         [HttpPost]
         [ModelStateValidationFilter]
-        public async Task<ActionResult<ApiResponse<ComentarioDTO>>> Post(int idPublicacion, [FromBody] ComentarioCreacionDTO comentarioCreacionDTO)
+        public async Task<ActionResult<ApiResponse<ComentarioDTO>>> Post([FromRoute]int idPublicacion, [FromBody] ComentarioCreacionDTO comentarioCreacionDTO)
         {
             ComentarioDTO comentario = null;
             ComentarioCreacionParaServiceDTO comentarioCreacionParaServiceDTO = new();
@@ -104,7 +115,7 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtRoute("ObtenetComentarioPorId", new { id = comentario.Id, idPublicacion }, new ApiResponse<ComentarioDTO>(true, 201, "recurso creado", comentario, null));
+            return CreatedAtRoute("ObtenerComentarioPorId", new { idPublicacion, idComentario = comentario.Id  }, new ApiResponse<ComentarioDTO>(true, 201, "recurso creado", comentario, null));
         }
 
 

@@ -18,6 +18,7 @@ namespace DAL.DTOs.PublicacionDTOs
 
         [Display(Name = "contenido")]
         [Required(ErrorMessage = "el campo {0} es requerido")]
+        [StringLength(250, ErrorMessage = "El campo {0} debe tener maximo {1} caracteres")]
         public string Contenido { get; set; }
                 
     }

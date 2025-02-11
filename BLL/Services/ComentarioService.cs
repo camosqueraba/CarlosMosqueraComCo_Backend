@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BLL.Interfaces;
 using DAL.DTOs.ComentarioDTOs;
 using DAL.Model;
 using Repository.Interfaces;
-using Repository.Repositories;
 
 namespace BLL.Services
 {
@@ -32,7 +26,7 @@ namespace BLL.Services
 
         public async Task<List<ComentarioDTO>> GetComentariosPorIdPublicacion(int idPublicacion)
         {
-            List<Comentario> comentarios = await ComentarioRepository.GetAll();
+            List<Comentario> comentarios = await ComentarioRepository.GetComentariosPorIdPublicacion(idPublicacion);
             List<ComentarioDTO> comentariosDTO = mapper.Map<List<ComentarioDTO>>(comentarios);
             return comentariosDTO;
         }

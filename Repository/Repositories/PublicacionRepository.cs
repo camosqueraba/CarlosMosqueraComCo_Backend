@@ -40,19 +40,26 @@ namespace Repository.Repositories
         }
         */
         public async Task<ResultadoOperacion<int>> Create(Publicacion publicacion)
-        {
-            int idPublicacionCreated;
-            ResultadoOperacion<int> resultadoOperacion = new();
+        {            
+            ResultadoOperacion<int> resultadoOperacionCreate = new();
             try
             {
                 DBContext.Add(publicacion);
-                await DBContext.SaveChangesAsync();
+                int resultado = await DBContext.SaveChangesAsync();
 
-                resultadoOperacion.OperacionCompletada = true;
-                resultadoOperacion.DatosResultado = publicacion.Id;
-
+                if (resultado > 0)
+                {
+                    resultadoOperacionCreate.OperacionCompletada = true;
+                    resultadoOperacionCreate.DatosResultado = publicacion.Id;
+                }
+                else
+                {
+                    resultadoOperacionCreate.OperacionCompletada = false;
+                    resultadoOperacionCreate.Origen = "PublicacionRepository.Create";
+                    resultadoOperacionCreate.Error = "No se pudo guardar en DB";
+                }
                 /*
-                resultadoOperacion = new ResultadoOperacion<int>()
+                resultadoOperacionCreate = new ResultadoOperacion<int>()
                 {
                     OperacionCompletada = true,
                     DatosResultado = publicacion.Id,
@@ -62,15 +69,46 @@ namespace Repository.Repositories
             }
             catch (Exception ex)
             {
-                resultadoOperacion.OperacionCompletada = false;
-                resultadoOperacion.Origen = "PublicacionRepository.Create";
-                resultadoOperacion.Error = ex.Message;
+                resultadoOperacionCreate.OperacionCompletada = false;
+                resultadoOperacionCreate.Origen = "PublicacionRepository.Create";
+                resultadoOperacionCreate.Error = ex.Message;
             }
 
-            return resultadoOperacion;
+            return resultadoOperacionCreate;
         }
+        
+        public async Task<ResultadoOperacion<int>> Delete(int id)
+        {
+            ResultadoOperacion<int> resultadoOperacionDelete = new();
+            try
+            {
+                Publicacion publicacion = await DBContext.Publicaciones.FirstAsync(c => c.Id == id);
 
+                DBContext.Remove(publicacion);
+                int resultado = await DBContext.SaveChangesAsync();
 
+                if (resultado > 0)
+                {
+                    resultadoOperacionDelete.OperacionCompletada = true;
+                    resultadoOperacionDelete.DatosResultado = 0;
+                }
+                else
+                {
+                    resultadoOperacionDelete.OperacionCompletada = false;
+                    resultadoOperacionDelete.Origen = "PublicacionRepository.Delete";
+                    resultadoOperacionDelete.Error = "No se pudo eliminar de DB";
+                }
+            }            
+            catch (Exception ex)
+            {
+                resultadoOperacionDelete.OperacionCompletada = false;
+                resultadoOperacionDelete.Origen = "PublicacionRepository.Delete";
+                resultadoOperacionDelete.Error = ex.Message;
+            }
+            return resultadoOperacionDelete;
+        }
+        
+        /*
         public async Task<int> Delete(int id)
         {
             int response;
@@ -91,7 +129,7 @@ namespace Repository.Repositories
             }
             return response;
         }
-
+        */
         public async Task<List<Publicacion>> GetAll()
         {
             List<Publicacion> publicacions = null;
@@ -99,6 +137,7 @@ namespace Repository.Repositories
             try
             {
                 publicacions = await DBContext.Publicaciones.ToListAsync();
+                //var publicacionsTransform = publicacions.Select(p => new { Publicacion = p, ConteoComentarios = p.Comentarios.Count() });
             }
             catch (SqlException ex)
             {
@@ -115,12 +154,16 @@ namespace Repository.Repositories
             return publicacions;
         }
 
-        public async Task<Publicacion> GetById(int id)
+        public async Task<ResultadoOperacion<Publicacion>> GetById(int id)
         {
-            Publicacion publicacion = new Publicacion();
+            Publicacion publicacion = null;
+            ResultadoOperacion<Publicacion> resultadoOperacion = new();
             try
             {
-                publicacion = await DBContext.Publicaciones.AsNoTracking().FirstOrDefaultAsync(publicacion => publicacion.Id == id);
+                publicacion = await DBContext.Publicaciones.AsNoTracking().Include("Comentarios").FirstOrDefaultAsync(publicacion => publicacion.Id == id);
+                
+                resultadoOperacion.DatosResultado = publicacion;
+                resultadoOperacion.OperacionCompletada = true;
             }
             catch (SqlException ex)
             {
@@ -133,7 +176,7 @@ namespace Repository.Repositories
                 throw new Exception(string.Concat("GetById() Exception: ", ex.Message));
             }
 
-            return publicacion;
+            return resultadoOperacion;
         }
 
 
