@@ -2,6 +2,7 @@
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
 using DAL.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,6 +11,7 @@ namespace API.Controllers
 {
     [Route("api/v1.0/publicaciones")]
     [ApiController]
+    [Authorize]
     public class PublicacionController : ControllerBase
     {
         private readonly IPublicacionService PublicacionService; 
@@ -20,6 +22,7 @@ namespace API.Controllers
 
         // GET: api/<PublicacionesController>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<PublicacionDTO>>> Get()
         { 
             List<PublicacionDTO> publicaciones = await PublicacionService.GetAll();

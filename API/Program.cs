@@ -1,8 +1,11 @@
+using System.Text;
 using API.Filtros;
 using BLL.Interfaces;
 using BLL.Services;
 using DAL.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Repository.DataContext;
 using Repository.Interfaces;
 using Repository.Repositories;
@@ -23,9 +26,13 @@ builder.Services.AddControllers(options =>
 
 
 builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones => {
-                                                                            opciones.UseSqlServer("name=SQLServerConnection");
+                                                                            opciones.UseSqlServer("name=SQLServerConnection", migration => migration.MigrationsAssembly("Repository"));
                                                                             //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
+
+builder.Services.AddIdentityCore<IdentityUser>()
+                                                .AddEntityFrameworkStores<ApplicationDBContext_SQLServer>()
+                                                .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 builder.Services.AddScoped<IPublicacionService,    PublicacionService>();
@@ -33,7 +40,23 @@ builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
 builder.Services.AddScoped<IComentarioService,     ComentarioService>();
 builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
 
+builder.Services.AddScoped<UserManager<IdentityUser>>();
+builder.Services.AddScoped<SignInManager<IdentityUser>>();
+builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddAuthentication().AddJwtBearer(opciones =>
+{
+    opciones.MapInboundClaims = false;
+    opciones.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["llavejwt"]!)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
