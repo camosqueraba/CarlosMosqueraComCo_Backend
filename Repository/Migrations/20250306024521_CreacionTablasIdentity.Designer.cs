@@ -12,8 +12,8 @@ using Repository.DataContext;
 namespace Repository.Migrations
 {
     [DbContext(typeof(ApplicationDBContext_SQLServer))]
-    [Migration("20250211030631_SistemaDeUsuarios")]
-    partial class SistemaDeUsuarios
+    [Migration("20250306024521_CreacionTablasIdentity")]
+    partial class CreacionTablasIdentity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace Repository.Migrations
 
                     b.Property<int>("PublicacionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UsuarioId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class SistemaDeUsuarios : Migration
+    public partial class CreacionTablasIdentity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -50,7 +50,21 @@ namespace Repository.Migrations
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
-            
+            //migrationBuilder.CreateTable(
+            //    name: "Publicaciones",
+            //    columns: table => new
+            //    {
+            //        Id = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("SqlServer:Identity", "1, 1"),
+            //        Titulo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+            //        Contenido = table.Column<string>(type: "nvarchar(max)", nullable: true),
+            //        FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        FechaModificacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_Publicaciones", x => x.Id);
+            //    });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -157,7 +171,29 @@ namespace Repository.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            
+
+            //migrationBuilder.CreateTable(
+            //    name: "Comentarios",
+            //    columns: table => new
+            //    {
+            //        Id = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("SqlServer:Identity", "1, 1"),
+            //        Contenido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        FechaModificacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        PublicacionId = table.Column<int>(type: "int", nullable: false),
+            //        UsuarioId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_Comentarios", x => x.Id);
+            //        table.ForeignKey(
+            //            name: "FK_Comentarios_Publicaciones_PublicacionId",
+            //            column: x => x.PublicacionId,
+            //            principalTable: "Publicaciones",
+            //            principalColumn: "Id",
+            //            onDelete: ReferentialAction.Cascade);
+            //    });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -198,10 +234,10 @@ namespace Repository.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Comentarios_PublicacionId",
-                table: "Comentarios",
-                column: "PublicacionId");
+        //    migrationBuilder.CreateIndex(
+        //        name: "IX_Comentarios_PublicacionId",
+        //        table: "Comentarios",
+        //        column: "PublicacionId");
         }
 
         /// <inheritdoc />

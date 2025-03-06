@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DAL.DTOs.ComentarioDTOs;
 using DAL.DTOs.PublicacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 
 namespace DAL.Utilities
@@ -18,6 +19,11 @@ namespace DAL.Utilities
             CreateMap<ComentarioEdicionDTO, Comentario>();
             CreateMap<Comentario, ComentarioDTO>();
             CreateMap<ComentarioCreacionParaServiceDTO, Comentario>();
+
+            CreateMap<UsuarioCreacionDTO, Usuario>();
+            //CreateMap<ComentarioEdicionDTO, Comentario>();
+            CreateMap<Usuario, UsuarioDTO>();
+            //CreateMap<ComentarioCreacionParaServiceDTO, Comentario>();
         }
     }
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DAL.DTOs.UsuarioDTOs
 {
-    internal class CredencialesUsuarioDTOs
+    public class RespuestaAutenticacionDTO
     {
+        public string Token { get; set; }
+        public DateTime Expiracion { get; set; }
     }
 }

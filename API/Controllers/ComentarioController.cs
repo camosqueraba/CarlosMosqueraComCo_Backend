@@ -3,6 +3,7 @@ using BLL.Interfaces;
 using BLL.Services;
 using DAL.DTOs.ComentarioDTOs;
 using DAL.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -11,6 +12,7 @@ namespace API.Controllers
 {    
     [ApiController]
     [Route("api/v1.0/publicaciones/{idPublicacion:int}/comentarios")]
+    [Authorize]
     public class ComentarioController : ControllerBase
     {
         private readonly IComentarioService ComentarioService;

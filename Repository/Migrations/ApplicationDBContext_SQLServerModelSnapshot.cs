@@ -43,6 +43,9 @@ namespace Repository.Migrations
                     b.Property<int>("PublicacionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UsuarioId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PublicacionId");

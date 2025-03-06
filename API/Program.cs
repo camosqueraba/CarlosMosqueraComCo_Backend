@@ -37,8 +37,12 @@ builder.Services.AddIdentityCore<IdentityUser>()
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 builder.Services.AddScoped<IPublicacionService,    PublicacionService>();
 builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
+
 builder.Services.AddScoped<IComentarioService,     ComentarioService>();
 builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
+
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddScoped<UserManager<IdentityUser>>();
 builder.Services.AddScoped<SignInManager<IdentityUser>>();
@@ -49,8 +53,8 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
     opciones.MapInboundClaims = false;
     opciones.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["llavejwt"]!)),
