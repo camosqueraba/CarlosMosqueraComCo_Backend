@@ -4,7 +4,7 @@ using DAL.DTOs.PublicacionDTOs;
 using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 
-namespace DAL.Utilities
+namespace BLL.Utilities
 {
     public class AutoMapperProfiles : Profile
     {
@@ -23,6 +23,7 @@ namespace DAL.Utilities
             CreateMap<UsuarioCreacionDTO, Usuario>();
             //CreateMap<ComentarioEdicionDTO, Comentario>();
             CreateMap<Usuario, UsuarioDTO>();
+            //CreateMap<IdentityUser, UsuarioDTO>();
             //CreateMap<ComentarioCreacionParaServiceDTO, Comentario>();
         }
     }

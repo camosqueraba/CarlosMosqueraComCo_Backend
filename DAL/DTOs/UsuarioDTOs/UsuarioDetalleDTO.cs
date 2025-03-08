@@ -15,7 +15,7 @@ namespace DAL.DTOs.UsuarioDTOs
         public string NormalizedEmail { get; set; }
         public string PhoneNumber { get; set; }
         public bool TwoFactorEnabled { get; set; }
-        public bool LockoutEnd { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
         public int AccessFailedCount { get; set; }
     }
 }

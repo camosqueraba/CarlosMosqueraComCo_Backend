@@ -4,11 +4,6 @@ using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 using Repository.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL.Services
 {
@@ -23,16 +18,37 @@ namespace BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<UsuarioDTO>> GetAll()
+        public async Task<ResultadoOperacion<List<UsuarioDTO>>> GetAll()
         {
+            ResultadoOperacion<List<UsuarioDTO>> resultadoOperacion = new();
+            try
+            {
+                var resultadoOperacionRepository = await UsuarioRepository.GetAll();
+                if(resultadoOperacionRepository != null && resultadoOperacionRepository.OperacionCompletada)
+                {
+                    //resultadoOperacion.DatosResultado = (List<UsuarioDTO>)resultadoOperacionRepository.DatosResultado.Select(identityUser => identityUser);
+                    resultadoOperacion.DatosResultado = resultadoOperacionRepository.DatosResultado
+                        .Select(identityUser => new UsuarioDTO {
+                            Id = identityUser.Id,                                        
+                            UserName = identityUser.UserName,
+                            Email = identityUser.Email
+                        }).ToList();
 
-            var usuarios = await UsuarioRepository.GetAll();
-            List<UsuarioDTO> publicacionesDTO = mapper.Map<List<UsuarioDTO>>(usuarios);
-            return publicacionesDTO;
+                    resultadoOperacion.OperacionCompletada = true;
+                }
+                //List<UsuarioDTO> publicacionesDTO = mapper.Map<List<UsuarioDTO>>(usuarios);
+                //return publicacionesDTO;
+            }
+            catch (Exception ex)
+            {
+                resultadoOperacion.Origen = "UsuarioService.GetAll";
+                resultadoOperacion.Error = ex.Message;
+            }
+            return resultadoOperacion;
         }
 
         
-        public async Task<ResultadoOperacion<UsuarioDetalleDTO>> GetById(int id)
+        public async Task<ResultadoOperacion<UsuarioDetalleDTO>> GetById(string id)
         {
             ResultadoOperacion<UsuarioDetalleDTO> resultadoOperacionService = new();
             try
@@ -40,9 +56,24 @@ namespace BLL.Services
                 ResultadoOperacion<IdentityUser> resultadoOperacionRepository;
                 resultadoOperacionRepository = await UsuarioRepository.GetById(id);
 
-                if (resultadoOperacionRepository != null && resultadoOperacionRepository.OperacionCompletada == true)
+                if (resultadoOperacionRepository != null &&
+                    resultadoOperacionRepository.OperacionCompletada &&
+                    resultadoOperacionRepository.DatosResultado != null )
                 {
-                    resultadoOperacionService.DatosResultado = mapper.Map<UsuarioDetalleDTO>(resultadoOperacionRepository.DatosResultado);
+                    resultadoOperacionService.DatosResultado = new UsuarioDetalleDTO
+                    {                    
+                        UserName            = resultadoOperacionRepository.DatosResultado.UserName,
+                        NormalizedUserName  = resultadoOperacionRepository.DatosResultado.NormalizedUserName,
+                        Email               = resultadoOperacionRepository.DatosResultado.Email,
+                        NormalizedEmail     = resultadoOperacionRepository.DatosResultado.NormalizedEmail,
+                        PhoneNumber         = resultadoOperacionRepository.DatosResultado.PhoneNumber,
+                        TwoFactorEnabled    = resultadoOperacionRepository.DatosResultado.TwoFactorEnabled,
+                        LockoutEnd          = resultadoOperacionRepository.DatosResultado.LockoutEnd,
+                        AccessFailedCount   = resultadoOperacionRepository.DatosResultado.AccessFailedCount,
+
+                    };
+                    // mapper.Map<UsuarioDetalleDTO>(resultadoOperacionRepository.DatosResultado);
+
                     resultadoOperacionService.OperacionCompletada = true;
                     //resultadoOperacionService.DatosResultado = resultUsuarioDTO;
                 }
@@ -56,10 +87,10 @@ namespace BLL.Services
                 //IdentityUser usuario = await UsuarioRepository.GetById(id);
                 //UsuarioDetalleDTO publicacionDetalleDTO = mapper.Map<UsuarioDetalleDTO>(usuario);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                resultadoOperacionService.Origen = "UsuarioService.GetById";
+                resultadoOperacionService.Error = ex.Message;
             }
 
 
@@ -97,7 +128,7 @@ namespace BLL.Services
         {
             UsuarioDTO resultUsuarioDTO;
             ResultadoOperacion<UsuarioDTO> resultadoOperacionService = new();
-            ResultadoOperacion<int> resultadoOperacionRepository;
+            ResultadoOperacion<string> resultadoOperacionRepository;
             try
             {
                 Usuario usuario = mapper.Map<Usuario>(usuarioCreacionDTO);
@@ -109,6 +140,7 @@ namespace BLL.Services
                 if (resultadoOperacionRepository != null && resultadoOperacionRepository.OperacionCompletada == true)
                 {
                     resultUsuarioDTO = mapper.Map<UsuarioDTO>(usuario);
+                    resultUsuarioDTO.Id = resultadoOperacionRepository.DatosResultado;
                     resultadoOperacionService.OperacionCompletada = true;
                     resultadoOperacionService.DatosResultado = resultUsuarioDTO;
                 }

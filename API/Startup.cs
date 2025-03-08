@@ -1,6 +1,6 @@
 ﻿using BLL.Interfaces;
 using BLL.Services;
-using DAL.Utilities;
+//using DAL.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;
 using Repository.Interfaces;
@@ -52,7 +52,7 @@ namespace API
             services.AddSwaggerGen();
 
             //services.AddAutoMapper(typeof(Startup));
-            services.AddAutoMapper(typeof(AutoMapperProfiles));
+            //services.AddAutoMapper(typeof(AutoMapperProfiles));
 
             //services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDBContext>().AddDefaultTokenProviders();
 

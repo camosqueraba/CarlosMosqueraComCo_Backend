@@ -1,15 +1,9 @@
-﻿using DAL.DTOs.UsuarioDTOs;
-using DAL.Model;
+﻿using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;
 using Repository.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository.Repositories
 {   
@@ -48,9 +42,9 @@ namespace Repository.Repositories
             return idIdentityUserCreated;
         }
         */
-        public async Task<ResultadoOperacion<int>> Create(Usuario usuario)
+        public async Task<ResultadoOperacion<string>> Create(Usuario usuario)
         {
-            ResultadoOperacion<int> resultadoOperacionCreate = new();
+            ResultadoOperacion<string> resultadoOperacionCreate = new();
             try
             {
                 /*
@@ -72,18 +66,23 @@ namespace Repository.Repositories
 
                 };
 
-                var resultado = await userManager.CreateAsync(identityUser);
+                //var resultado = await userManager.CreateAsync(identityUser);
+                DBContext.Add(identityUser);
+                int resultado = await DBContext.SaveChangesAsync();
                 //DBContext.Add(identityUser);
-
-                if (resultado.Succeeded)
+                //var user = resultado.
+                
+                //if (resultado.Susseced)
+                if (resultado > 0)
                 {
                     resultadoOperacionCreate.OperacionCompletada = true;
+                    resultadoOperacionCreate.DatosResultado = identityUser.Id;
                 }
                 else
                 {
                     resultadoOperacionCreate.OperacionCompletada = false;
                     resultadoOperacionCreate.Origen = "IdentityUserRepository.Create";
-                    resultadoOperacionCreate.Error = resultado.Errors.ToString();
+                    //resultadoOperacionCreate.Error = resultado.Errors.ToString();
                 }
                 
             }
@@ -153,52 +152,59 @@ namespace Repository.Repositories
         }
         */
         
-        public async Task<List<Usuario>> GetAll()
+        public async Task<ResultadoOperacion<List<IdentityUser>>> GetAll()
         {
-            List<Usuario> usuarios = null;
+            //List<Usuario> usuarios = null;
             List<IdentityUser> usuariosIdentity = null;
-
+            ResultadoOperacion<List<IdentityUser>> resultadoOperacionGetAll = new();
+            
             try
             {
                 usuariosIdentity = await DBContext.Users.ToListAsync();
+                //if(usuariosIdentity)
+                resultadoOperacionGetAll.DatosResultado = usuariosIdentity;
+                resultadoOperacionGetAll.OperacionCompletada = true;
                 //var IdentityUsersTransform = IdentityUsers.Select(p => new { IdentityUser = p, ConteoComentarios = p.Comentarios.Count() });
-            }
-            catch (SqlException ex)
-            {
-
-                throw new Exception(string.Concat("IdentityUserRepository.GetAll(IdentityUser IdentityUser) Exception: ", ex.Message));
-            }
+            }            
             catch (Exception ex)
             {
-
-                throw new Exception(string.Concat("IdentityUserRepository.GetAll(IdentityUser IdentityUser) Exception: ", ex.Message));
+                resultadoOperacionGetAll.Origen = "IdentityUserRepository.GetAll";
+                resultadoOperacionGetAll.Error = ex.Message;
+                //throw new Exception(string.Concat("IdentityUserRepository.GetAll(IdentityUser IdentityUser) Exception: ", ex.Message));
             }
 
 
-            return usuarios;
+            return resultadoOperacionGetAll;
         }
         
         
-        public async Task<ResultadoOperacion<UsuarioDetalleDTO>> GetById(string id)
+        public async Task<ResultadoOperacion<IdentityUser>> GetById(string id)
         {
             IdentityUser usuario = null;
-            ResultadoOperacion<UsuarioDetalleDTO> resultadoOperacion = new();
+            ResultadoOperacion<IdentityUser> resultadoOperacion = new();
             try
             {
                 usuario = await DBContext.Users.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id);
 
-                resultadoOperacion.DatosResultado = IdentityUser;
+                resultadoOperacion.DatosResultado = usuario;
+                    //new UsuarioDetalleDTO
+                //{                    
+                //    UserName            = usuario.UserName,
+                //    NormalizedUserName  = usuario.NormalizedUserName,
+                //    Email               = usuario.Email,
+                //    NormalizedEmail     = usuario.NormalizedEmail,
+                //    PhoneNumber         = usuario.PhoneNumber,
+                //    TwoFactorEnabled    = usuario.TwoFactorEnabled,
+                //    LockoutEnd          = usuario.LockoutEnd,
+                //    AccessFailedCount   = usuario.AccessFailedCount,
+
+                //};
                 resultadoOperacion.OperacionCompletada = true;
             }
             catch (SqlException ex)
             {
-
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(string.Concat("GetById() Exception: ", ex.Message));
+                resultadoOperacion.Origen = "UsuarioRepository.GetAll";
+                resultadoOperacion.Error = ex.Message;
             }
 
             return resultadoOperacion;

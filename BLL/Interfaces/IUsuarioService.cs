@@ -8,8 +8,8 @@ namespace BLL.Interfaces
         public Task<ResultadoOperacion<UsuarioDTO>> Create(UsuarioCreacionDTO usuarioCreaconDTO);
         //Task<ResultadoOperacion<int>> Delete(int id);
         public Task<bool> ExisteUsuario(string email);
-        public Task<List<UsuarioDTO>> GetAll();
-        //Task<ResultadoOperacion<IdentityUser>> GetById(int id);
+        public Task<ResultadoOperacion<List<UsuarioDTO>>> GetAll();
+        Task<ResultadoOperacion<UsuarioDetalleDTO>> GetById(string id);
         //Task<int> Update(IdentityUser Usuario);
     }
 }

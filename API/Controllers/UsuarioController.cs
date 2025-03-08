@@ -153,13 +153,36 @@ namespace API.Controllers
           // GET: api/<UsuarioesController>
         [HttpGet]
         
-        public async Task<ActionResult<List<UsuarioDTO>>> Get()
-        { 
-            List<UsuarioDTO> usuarioes = await UsuarioService.GetAll();
+        public async Task<ActionResult<ApiResponse<List<UsuarioDTO>>>> Get()
+        {
+            string titulo = "registros encontrados";
+            List<string> errores = [];
+            List<UsuarioDTO> usuarios = new();
 
-            string titulo = usuarioes.Count > 0 ? "registros encontrados" : "no se encontraron registros";
+            ResultadoOperacion<List<UsuarioDTO>> resultadoOperacion = await UsuarioService.GetAll();
+            
+            if(resultadoOperacion != null && resultadoOperacion.OperacionCompletada)
+            {
+                if(resultadoOperacion.DatosResultado != null && resultadoOperacion.DatosResultado.Count < 1)
+                {
+                    titulo = "no se encontarron registros";
+                }
+                else
+                {
+                    usuarios = resultadoOperacion.DatosResultado;
+                }
+            }
+            else
+            {
+                titulo = "error en la consulta";
+                errores.Add(resultadoOperacion.Error);
+                errores.Add(resultadoOperacion.Origen);
+            }
+                //List<UsuarioDTO> usuarioes =
 
-            return Ok(new ApiResponse<List<UsuarioDTO>>(true, 200, titulo, usuarioes, null));
+                //string titulo = usuarioes.Count > 0 ? "registros encontrados" : "no se encontraron registros";
+
+            return Ok(new ApiResponse<List<UsuarioDTO>>(true, 200, titulo, usuarios, errores));
         }
 
         
