@@ -24,10 +24,14 @@ builder.Services.AddControllers(options =>
     options.SuppressModelStateInvalidFilter = true; 
 });
 
+var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermitidos")!.Split(",");
 
-builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones => {
-                                                                            opciones.UseSqlServer("name=SQLServerConnection", migration => migration.MigrationsAssembly("Repository"));
-                                                                            //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
+
+builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones =>
+{
+    opciones.UseSqlServer("name=SQLServerConnection", migration => migration.MigrationsAssembly("Repository"));
+    //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 builder.Services.AddIdentityCore<IdentityUser>()
@@ -66,6 +70,17 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(opciones =>
+{
+    opciones.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(origenesPermitidos)
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,6 +92,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 

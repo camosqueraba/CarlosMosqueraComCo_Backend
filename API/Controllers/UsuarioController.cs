@@ -165,7 +165,7 @@ namespace API.Controllers
             {
                 if(resultadoOperacion.DatosResultado != null && resultadoOperacion.DatosResultado.Count < 1)
                 {
-                    titulo = "no se encontarron registros";
+                    titulo = "no se encontraron registros";
                 }
                 else
                 {
