@@ -1,4 +1,5 @@
-﻿using DAL.Model;
+﻿using DAL.DTOs.UsuarioDTOs;
+using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 
 namespace Repository.Interfaces
@@ -10,6 +11,8 @@ namespace Repository.Interfaces
         Task<bool> ExisteUsuario(string email);
         Task<ResultadoOperacion<List<IdentityUser>>> GetAll();
         Task<ResultadoOperacion<IdentityUser>> GetById(string id);
+
+        Task<ResultadoOperacion<RespuestaAutenticacionDTO>> RegistrarUsuario(CredencialesUsuarioDTO credencialesUsuarioDTO);
         //Task<int> Update(IdentityUser Usuario);
     }
 }

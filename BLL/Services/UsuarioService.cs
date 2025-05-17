@@ -4,6 +4,7 @@ using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 using Repository.Interfaces;
+using Repository.Repositories;
 
 namespace BLL.Services
 {
@@ -209,5 +210,9 @@ namespace BLL.Services
             return existeUsuario;
         }
 
+        public async Task<ResultadoOperacion<RespuestaAutenticacionDTO>> RegistrarUsuario(CredencialesUsuarioDTO credencialesUsuarioDTO)
+        {
+            return await UsuarioRepository.RegistrarUsuario(credencialesUsuarioDTO);
+        }
     }
 }

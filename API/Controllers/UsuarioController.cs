@@ -1,7 +1,5 @@
 ﻿using API.Filtros;
 using BLL.Interfaces;
-using BLL.Services;
-using DAL.DTOs.UsuarioDTOs;
 using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,18 +32,43 @@ namespace API.Controllers
             this.configuration = configuration;
         }
 
-        [HttpPost("registro-usuario")]
+        [HttpPost("registro")]
         [AllowAnonymous]
         public async Task<ActionResult<RespuestaAutenticacionDTO>> Registrar(CredencialesUsuarioDTO credencialesUsuarioDTO)
         {
+            ResultadoOperacion<RespuestaAutenticacionDTO> resultado = await UsuarioService.RegistrarUsuario(credencialesUsuarioDTO);
+            string titulo;
+            RespuestaAutenticacionDTO resultadoRegistro = new();
+            List<string> errores = new List<string>();
+            bool operacionCompletada; 
+
+            if (resultado != null && resultado.OperacionCompletada)
+            {
+                titulo = "registro completado";
+                resultadoRegistro = resultado.DatosResultado;
+                operacionCompletada = true;
+            }
+            else if (resultado != null && !resultado.OperacionCompletada)
+            {
+                titulo = "registro NO completado";
+                errores = resultado.Error.Split("|").ToList();
+                operacionCompletada = false;
+            }
+            else
+            {
+                titulo = "error al registrar";
+                operacionCompletada = false;
+            }
+            
+            return Ok(new ApiResponse<RespuestaAutenticacionDTO>(operacionCompletada, 200, titulo, resultadoRegistro, errores));
+            /*
+            var resultado = await userManager.CreateAsync(usuario, credencialesUsuarioDTO.Password);
             var usuario = new IdentityUser
             {
                 UserName = credencialesUsuarioDTO.Email,
                 Email = credencialesUsuarioDTO.Email
             };
-
-            var resultado = await userManager.CreateAsync(usuario, credencialesUsuarioDTO.Password);
-
+            
             if (resultado.Succeeded)
             {
                 var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO);
@@ -59,6 +83,7 @@ namespace API.Controllers
 
                 return ValidationProblem();
             }
+            */
         }
 
         [HttpPost]

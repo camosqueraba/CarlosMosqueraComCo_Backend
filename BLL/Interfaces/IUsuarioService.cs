@@ -10,6 +10,7 @@ namespace BLL.Interfaces
         public Task<bool> ExisteUsuario(string email);
         public Task<ResultadoOperacion<List<UsuarioDTO>>> GetAll();
         Task<ResultadoOperacion<UsuarioDetalleDTO>> GetById(string id);
+        Task<ResultadoOperacion<RespuestaAutenticacionDTO>> RegistrarUsuario(CredencialesUsuarioDTO credencialesUsuarioDTO);
         //Task<int> Update(IdentityUser Usuario);
     }
 }
