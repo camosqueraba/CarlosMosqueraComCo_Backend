@@ -1,4 +1,5 @@
-﻿using DAL.Model;
+﻿using DAL.DTOs.UtilDTOs;
+using DAL.Model;
 
 namespace Repository.Interfaces
 {

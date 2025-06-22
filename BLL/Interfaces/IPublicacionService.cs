@@ -1,5 +1,5 @@
 ﻿using DAL.DTOs.PublicacionDTOs;
-using DAL.Model;
+using DAL.DTOs.UtilDTOs;
 
 namespace BLL.Interfaces
 {

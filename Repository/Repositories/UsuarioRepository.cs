@@ -1,17 +1,17 @@
-﻿using DAL.DTOs.UsuarioDTOs;
+﻿using DAL.DTOs.AutenticacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
+using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Repository.DataContext;
 using Repository.Interfaces;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace Repository.Repositories
 {   
@@ -20,12 +20,14 @@ namespace Repository.Repositories
         private readonly ApplicationDBContext_SQLServer DBContext;
         private readonly UserManager<IdentityUser> UserManager;
         private readonly IConfiguration Configuration;
+        
         public UsuarioRepository(ApplicationDBContext_SQLServer dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             DBContext = dbContext;
             this.UserManager = userManager;
             this.Configuration = configuration;
         }
+
         /*
         public async Task<int> Create(IdentityUser IdentityUser)
         {
@@ -52,6 +54,7 @@ namespace Repository.Repositories
             return idIdentityUserCreated;
         }
         */
+
         public async Task<ResultadoOperacion<string>> Create(Usuario usuario)
         {
             ResultadoOperacion<string> resultadoOperacionCreate = new();
@@ -197,18 +200,20 @@ namespace Repository.Repositories
                 usuario = await DBContext.Users.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id);
 
                 resultadoOperacion.DatosResultado = usuario;
-                    //new UsuarioDetalleDTO
-                //{                    
-                //    UserName            = usuario.UserName,
-                //    NormalizedUserName  = usuario.NormalizedUserName,
-                //    Email               = usuario.Email,
-                //    NormalizedEmail     = usuario.NormalizedEmail,
-                //    PhoneNumber         = usuario.PhoneNumber,
-                //    TwoFactorEnabled    = usuario.TwoFactorEnabled,
-                //    LockoutEnd          = usuario.LockoutEnd,
-                //    AccessFailedCount   = usuario.AccessFailedCount,
+                /*
+                new UsuarioDetalleDTO                
+                {
+                    UserName = usuario.UserName,
+                    NormalizedUserName = usuario.NormalizedUserName,
+                    Email = usuario.Email,
+                    NormalizedEmail = usuario.NormalizedEmail,
+                    PhoneNumber = usuario.PhoneNumber,
+                    TwoFactorEnabled = usuario.TwoFactorEnabled,
+                    LockoutEnd = usuario.LockoutEnd,
+                    AccessFailedCount = usuario.AccessFailedCount,
 
-                //};
+                };
+                */
                 resultadoOperacion.OperacionCompletada = true;
             }
             catch (SqlException ex)

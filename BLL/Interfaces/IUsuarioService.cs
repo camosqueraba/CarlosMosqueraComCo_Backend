@@ -1,5 +1,6 @@
-﻿using DAL.DTOs.UsuarioDTOs;
-using DAL.Model;
+﻿using DAL.DTOs.AutenticacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
+using DAL.DTOs.UtilDTOs;
 
 namespace BLL.Interfaces
 {

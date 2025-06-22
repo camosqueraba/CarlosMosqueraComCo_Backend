@@ -1,4 +1,4 @@
-﻿namespace DAL.Model
+﻿namespace DAL.DTOs.UtilDTOs
 {
     public class ApiResponse<T>
     {

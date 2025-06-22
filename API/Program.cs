@@ -1,4 +1,3 @@
-using System.Text;
 using API.Filtros;
 using BLL.Interfaces;
 using BLL.Services;
@@ -9,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using Repository.DataContext;
 using Repository.Interfaces;
 using Repository.Repositories;
+using Repository.Utils;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,10 @@ builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+builder.Services.AddScoped<IAutorizacionUtilsService, AutorizacionUtilsService>();
+builder.Services.AddScoped<IAutorizacionUtilsRepository, AutorizacionUtilsRepository>();
+
 
 builder.Services.AddScoped<UserManager<IdentityUser>>();
 builder.Services.AddScoped<SignInManager<IdentityUser>>();

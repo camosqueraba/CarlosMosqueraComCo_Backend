@@ -1,4 +1,6 @@
-﻿using DAL.DTOs.UsuarioDTOs;
+﻿using DAL.DTOs.AutenticacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
+using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 

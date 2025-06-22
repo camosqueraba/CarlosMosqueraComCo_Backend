@@ -1,4 +1,5 @@
-﻿using DAL.Model;
+﻿using DAL.DTOs.UtilDTOs;
+using DAL.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;

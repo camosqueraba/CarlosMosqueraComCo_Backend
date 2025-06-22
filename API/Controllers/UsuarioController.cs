@@ -1,11 +1,14 @@
 ﻿using API.Filtros;
 using BLL.Interfaces;
+using DAL.DTOs.AutenticacionDTOs;
 using DAL.DTOs.UsuarioDTOs;
-using DAL.Model;
+using DAL.DTOs.UtilDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+
+//using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,14 +24,16 @@ namespace API.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IAutorizacionUtilsService autorizacionUtilsService;
         private readonly IUsuarioService UsuarioService;
         private readonly IConfiguration configuration;        
 
-        public UsuarioController(IUsuarioService usuarioService, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager ,IConfiguration configuration)
+        public UsuarioController(IUsuarioService usuarioService, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IAutorizacionUtilsService autorizacionUtilsService,IConfiguration configuration)
         {
             UsuarioService = usuarioService;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.autorizacionUtilsService = autorizacionUtilsService;
             this.configuration = configuration;
         }
 
@@ -120,8 +125,9 @@ namespace API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<RespuestaAutenticacionDTO>> Login(CredencialesUsuarioDTO credencialesUsuarioDTO)
         {
+            //bool usuario = await UsuarioService.ExisteUsuario(credencialesUsuarioDTO.Email);
             var usuario = await userManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
-            
+
             if (usuario is null)
             {
                 return RetornarLoginIncorrecto();
@@ -131,7 +137,7 @@ namespace API.Controllers
 
             if (resultado.Succeeded)
             {
-                return await ConstruirToken(credencialesUsuarioDTO);
+                return await autorizacionUtilsService.ConstruirToken(credencialesUsuarioDTO);
             }
             else
             {
@@ -144,7 +150,8 @@ namespace API.Controllers
             ModelState.AddModelError(string.Empty, "Login incorrecto");
             return ValidationProblem();
         }
-
+        
+        /*
         private async Task<RespuestaAutenticacionDTO> ConstruirToken(CredencialesUsuarioDTO credencialesUsuarioDTO)
         {           
 
@@ -173,7 +180,7 @@ namespace API.Controllers
             };
 
         }
-
+        */
         
           // GET: api/<UsuarioesController>
         [HttpGet]
