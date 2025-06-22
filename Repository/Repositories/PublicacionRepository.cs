@@ -1,4 +1,5 @@
-﻿using DAL.Model;
+﻿using DAL.DTOs.UtilDTOs;
+using DAL.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;
@@ -58,6 +59,8 @@ namespace Repository.Repositories
                     resultadoOperacionCreate.Origen = "PublicacionRepository.Create";
                     resultadoOperacionCreate.Error = "No se pudo guardar en DB";
                 }
+
+                return resultadoOperacionCreate;
                 /*
                 resultadoOperacionCreate = new ResultadoOperacion<int>()
                 {
@@ -72,9 +75,8 @@ namespace Repository.Repositories
                 resultadoOperacionCreate.OperacionCompletada = false;
                 resultadoOperacionCreate.Origen = "PublicacionRepository.Create";
                 resultadoOperacionCreate.Error = ex.Message;
-            }
-
-            return resultadoOperacionCreate;
+                return resultadoOperacionCreate;
+            } 
         }
         
         public async Task<ResultadoOperacion<int>> Delete(int id)

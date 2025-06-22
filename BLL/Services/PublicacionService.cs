@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
+using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Repository.Interfaces;
 using Repository.Repositories;

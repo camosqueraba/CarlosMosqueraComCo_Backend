@@ -1,6 +1,6 @@
-﻿using DAL.Model;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using DAL.DTOs.UtilDTOs;
 
 namespace API.Filtros
 {

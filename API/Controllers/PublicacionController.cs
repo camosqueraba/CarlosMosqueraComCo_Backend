@@ -1,6 +1,7 @@
 ﻿using API.Filtros;
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
+using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,21 +1,33 @@
-﻿using DAL.Model;
+﻿using DAL.DTOs.AutenticacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
+using DAL.DTOs.UtilDTOs;
+using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Repository.DataContext;
 using Repository.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
 
 namespace Repository.Repositories
 {   
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly ApplicationDBContext_SQLServer DBContext;
-        private readonly UserManager<IdentityUser> userManager;
-        public UsuarioRepository(ApplicationDBContext_SQLServer dbContext, UserManager<IdentityUser> userManager)
+        private readonly UserManager<IdentityUser> UserManager;
+        private readonly IConfiguration Configuration;
+        
+        public UsuarioRepository(ApplicationDBContext_SQLServer dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             DBContext = dbContext;
-            this.userManager = userManager;
+            this.UserManager = userManager;
+            this.Configuration = configuration;
         }
+
         /*
         public async Task<int> Create(IdentityUser IdentityUser)
         {
@@ -42,6 +54,7 @@ namespace Repository.Repositories
             return idIdentityUserCreated;
         }
         */
+
         public async Task<ResultadoOperacion<string>> Create(Usuario usuario)
         {
             ResultadoOperacion<string> resultadoOperacionCreate = new();
@@ -187,18 +200,20 @@ namespace Repository.Repositories
                 usuario = await DBContext.Users.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id);
 
                 resultadoOperacion.DatosResultado = usuario;
-                    //new UsuarioDetalleDTO
-                //{                    
-                //    UserName            = usuario.UserName,
-                //    NormalizedUserName  = usuario.NormalizedUserName,
-                //    Email               = usuario.Email,
-                //    NormalizedEmail     = usuario.NormalizedEmail,
-                //    PhoneNumber         = usuario.PhoneNumber,
-                //    TwoFactorEnabled    = usuario.TwoFactorEnabled,
-                //    LockoutEnd          = usuario.LockoutEnd,
-                //    AccessFailedCount   = usuario.AccessFailedCount,
+                /*
+                new UsuarioDetalleDTO                
+                {
+                    UserName = usuario.UserName,
+                    NormalizedUserName = usuario.NormalizedUserName,
+                    Email = usuario.Email,
+                    NormalizedEmail = usuario.NormalizedEmail,
+                    PhoneNumber = usuario.PhoneNumber,
+                    TwoFactorEnabled = usuario.TwoFactorEnabled,
+                    LockoutEnd = usuario.LockoutEnd,
+                    AccessFailedCount = usuario.AccessFailedCount,
 
-                //};
+                };
+                */
                 resultadoOperacion.OperacionCompletada = true;
             }
             catch (SqlException ex)
@@ -209,7 +224,7 @@ namespace Repository.Repositories
 
             return resultadoOperacion;
         }
-        
+
 
         /*
         public async Task<int> Update(IdentityUser usuario)
@@ -238,12 +253,59 @@ namespace Repository.Repositories
         }
         */
 
+        public async Task<ResultadoOperacion<RespuestaAutenticacionDTO>> RegistrarUsuario(CredencialesUsuarioDTO credencialesUsuarioDTO)
+        {
+            ResultadoOperacion<RespuestaAutenticacionDTO> resultadoOperacion = new();
+
+            try
+            {
+                //RespuestaAutenticacionDTO respuestaAutenticacion;
+                
+                var usuario = new IdentityUser
+                {
+                    UserName = credencialesUsuarioDTO.Email,
+                    Email = credencialesUsuarioDTO.Email
+                };
+
+                //var resultado = await UsuarioService.RegistrarUsuario(credencialesUsuarioDTO);
+                IdentityResult resultado = await UserManager.CreateAsync(usuario, credencialesUsuarioDTO.Password);
+
+                if (resultado.Succeeded)
+                {
+                    RespuestaAutenticacionDTO respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO);
+                    resultadoOperacion.DatosResultado = respuestaAutenticacion;
+                    resultadoOperacion.OperacionCompletada = true;
+                }
+                else
+                {
+                    foreach (var error in resultado.Errors)
+                    {
+                        resultadoOperacion.Error +=  error.Description + " ";
+                    }
+
+                    resultadoOperacion.OperacionCompletada = false;
+                    resultadoOperacion.Origen = "UsuarioRepository.Registrar";
+                }
+
+                return resultadoOperacion;
+            }
+            catch (Exception ex)
+            {
+                resultadoOperacion.OperacionCompletada = false;
+                resultadoOperacion.Origen = "UsuarioRepository.Registrar";
+                resultadoOperacion.Error = ex.Message;
+
+                return resultadoOperacion;
+            }
+           
+        }
+
         public async Task<bool> ExisteUsuario(string email)
         {
             bool existeusuario = false;
             try
             {                
-                var usuario = await userManager.FindByEmailAsync(email);
+                var usuario = await UserManager.FindByEmailAsync(email);
 
                 if(usuario is not null)
                     existeusuario = true;
@@ -260,7 +322,7 @@ namespace Repository.Repositories
             }
 
             return existeusuario;
-        }        
+        }
 
         /*
         public async Task<List<IdentityUser>> GetIdentityUsersDetalle()
@@ -324,5 +386,35 @@ namespace Repository.Repositories
 
         }
         */
+
+        private async Task<RespuestaAutenticacionDTO> ConstruirToken(CredencialesUsuarioDTO credencialesUsuarioDTO)
+        {
+
+            var claims = new List<Claim>
+            {
+                new Claim("email", credencialesUsuarioDTO.Email)
+            };
+
+            var usuario = await UserManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
+            var claimsDB = await UserManager.GetClaimsAsync(usuario!);
+
+            claims.AddRange(claimsDB);
+            var llave = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["llavejwt"]!));
+            var credenciales = new Microsoft.IdentityModel.Tokens.SigningCredentials(llave, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256);
+
+            var expiracion = DateTime.UtcNow.AddYears(1);
+
+            var tokenDeSeguridad = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiracion, signingCredentials: credenciales);
+
+            var token = new JwtSecurityTokenHandler().WriteToken(tokenDeSeguridad);
+
+            return new RespuestaAutenticacionDTO
+            {
+                Token = token,
+                Expiracion = expiracion
+            };
+
+        }
+
     }
 }
