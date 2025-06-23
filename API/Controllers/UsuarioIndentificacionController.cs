@@ -53,29 +53,7 @@ namespace API.Controllers
             }
 
             return Ok(new ApiResponse<RespuestaAutenticacionDTO>(operacionCompletada, 200, titulo, resultadoRegistro, errores));
-            /*
-            var resultado = await userManager.CreateAsync(usuario, credencialesUsuarioDTO.Password);
-            var usuario = new IdentityUser
-            {
-                UserName = credencialesUsuarioDTO.Email,
-                Email = credencialesUsuarioDTO.Email
-            };
             
-            if (resultado.Succeeded)
-            {
-                var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO);
-                return respuestaAutenticacion;
-            }
-            else
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return ValidationProblem();
-            }
-            */
         }
 
         
