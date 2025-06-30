@@ -1,3 +1,4 @@
+using API.ControllerService;
 using API.Filtros;
 using BLL.Interfaces;
 using BLL.Services;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository.DataContext;
+using Repository.IdentityEF;
 using Repository.Interfaces;
 using Repository.Repositories;
 using Repository.Utils;
@@ -25,6 +27,8 @@ builder.Services.AddControllers(options =>
     options.SuppressModelStateInvalidFilter = true; 
 });
 
+builder.Services.AddScoped<ApiResultFilter>();
+
 var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermitidos")!.Split(",");
 
 
@@ -35,7 +39,7 @@ builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones =>
     //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
-builder.Services.AddIdentityCore<IdentityUser>()
+builder.Services.AddIdentityCore<CustomIdentityUser>()
                                                 .AddEntityFrameworkStores<ApplicationDBContext_SQLServer>()
                                                 .AddDefaultTokenProviders();
 
@@ -47,14 +51,15 @@ builder.Services.AddScoped<IComentarioService,     ComentarioService>();
 builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioControllerService, UsuarioControllerService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddScoped<IAutorizacionUtilsService, AutorizacionUtilsService>();
 builder.Services.AddScoped<IAutorizacionUtilsRepository, AutorizacionUtilsRepository>();
 
 
-builder.Services.AddScoped<UserManager<IdentityUser>>();
-builder.Services.AddScoped<SignInManager<IdentityUser>>();
+builder.Services.AddScoped<UserManager<CustomIdentityUser>>();
+builder.Services.AddScoped<SignInManager<CustomIdentityUser>>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>

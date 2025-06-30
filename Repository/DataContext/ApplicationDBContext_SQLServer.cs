@@ -1,10 +1,11 @@
 ﻿using DAL.Model;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Repository.IdentityEF;
 
 namespace Repository.DataContext
 {
-    public class ApplicationDBContext_SQLServer : IdentityDbContext
+    public class ApplicationDBContext_SQLServer : IdentityDbContext<CustomIdentityUser>
     {
         public ApplicationDBContext_SQLServer(DbContextOptions options) : base(options)
         {

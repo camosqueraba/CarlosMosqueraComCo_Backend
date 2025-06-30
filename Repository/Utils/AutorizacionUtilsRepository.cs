@@ -3,6 +3,7 @@ using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Repository.IdentityEF;
 using Repository.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,11 +13,11 @@ namespace Repository.Utils
 {
     public class AutorizacionUtilsRepository : IAutorizacionUtilsRepository
     {
-        public static UserManager<IdentityUser> UserManager { get; set; }
+        public static UserManager<CustomIdentityUser> UserManager { get; set; }
         public static IConfiguration Configuration { get; set; }
-        private  static SignInManager<IdentityUser> _SignInManager { get; set; }
+        private  static SignInManager<CustomIdentityUser> _SignInManager { get; set; }
 
-        public AutorizacionUtilsRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
+        public AutorizacionUtilsRepository(UserManager<CustomIdentityUser> userManager, SignInManager<CustomIdentityUser> signInManager, IConfiguration configuration)
         {
             UserManager = userManager;
             _SignInManager = signInManager;
@@ -58,7 +59,7 @@ namespace Repository.Utils
         {
             bool resultadoValidarPassword = false;
 
-            IdentityUser usuario = await UserManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
+            CustomIdentityUser usuario = await UserManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
             
 
             if(usuario == null)
