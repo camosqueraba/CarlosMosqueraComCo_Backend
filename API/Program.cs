@@ -36,7 +36,6 @@ var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermiti
 builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones =>
 {
     opciones.UseSqlServer("name=SQLServerConnection", migration => migration.MigrationsAssembly("Repository"));
-    //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 builder.Services.AddIdentityCore<CustomIdentityUser>()
@@ -79,6 +78,15 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen(setup =>
+{
+    setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Api-CarlosMosqueraComCo",
+        Version = "v1"
+    });
+});
+
 
 builder.Services.AddCors(opciones =>
 {
@@ -93,13 +101,32 @@ builder.Services.AddCors(opciones =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+///Creacion de migraciones para produccion
 
+using (var scope = app.Services.CreateScope())
+{
+ var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext_SQLServer>();
+    if (dbContext.Database.IsRelational())
+    {
+        dbContext.Database.Migrate();
+    }
+}
+
+// Configure the HTTP request pipeline.
+/*
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+*/
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api-CarlosMosqueraComCo v1");
+});
+
 
 app.UseHttpsRedirection();
 
