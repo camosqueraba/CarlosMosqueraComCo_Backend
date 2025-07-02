@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Repository.DataContext;
+using Repository.IdentityEF;
 using Repository.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,10 +19,10 @@ namespace Repository.Repositories
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly ApplicationDBContext_SQLServer DBContext;
-        private readonly UserManager<IdentityUser> UserManager;
+        private readonly UserManager<CustomIdentityUser> UserManager;
         private readonly IConfiguration Configuration;
         
-        public UsuarioRepository(ApplicationDBContext_SQLServer dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public UsuarioRepository(ApplicationDBContext_SQLServer dbContext, UserManager<CustomIdentityUser> userManager, IConfiguration configuration)
         {
             DBContext = dbContext;
             this.UserManager = userManager;
@@ -71,7 +72,7 @@ namespace Repository.Repositories
                 //DBContext.Add(IdentityUser);
                 //await DBContext.SaveChangesAsync();
                 //idIdentityUserCreated = IdentityUser.Id;
-                IdentityUser identityUser = new IdentityUser
+                CustomIdentityUser identityUser = new CustomIdentityUser
                 {
                     UserName = usuario.UserName,
                     Email = usuario.Email,
@@ -99,6 +100,12 @@ namespace Repository.Repositories
                 }
                 
             }
+            catch (SqlException ex)
+            {
+                resultadoOperacionCreate.OperacionCompletada = false;
+                resultadoOperacionCreate.Origen = "IdentityUserRepository.Create";
+                resultadoOperacionCreate.Error = ex.Message;
+            }
             catch (Exception ex)
             {
                 resultadoOperacionCreate.OperacionCompletada = false;
@@ -108,7 +115,7 @@ namespace Repository.Repositories
 
             return resultadoOperacionCreate;
         }
-                
+
         /*
         public async Task<ResultadoOperacion<int>> Delete(int id)
         {
@@ -141,35 +148,44 @@ namespace Repository.Repositories
             return resultadoOperacionDelete;
         }
         */
-        
-        /*
-        public async Task<int> Delete(int id)
+
+        public async Task<ResultadoOperacion<int>> Delete(string id)
         {
-            int response;
+            ResultadoOperacion<int> resultadoOperacionDelete = new();
             try
             {
-                IdentityUser IdentityUser = await DBContext.Users.FirstAsync(c => c.Id == id);
+                IdentityUser usuario = await DBContext.Users.FirstAsync(c => c.Id == id);
 
-                DBContext.Remove(IdentityUser);
-                response = await DBContext.SaveChangesAsync();
-            }
-            catch (SqlException ex)
-            {
-                throw ex;
+                DBContext.Remove(usuario);
+                int resultado = await DBContext.SaveChangesAsync();
+
+                if (resultado > 0)
+                {
+                    resultadoOperacionDelete.OperacionCompletada = true;
+                    resultadoOperacionDelete.DatosResultado = 0;
+                }
+                else
+                {
+                    resultadoOperacionDelete.OperacionCompletada = false;
+                    resultadoOperacionDelete.Origen = "IdentityUserRepository.Delete";
+                    resultadoOperacionDelete.Error = "No se pudo eliminar de DB";
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Concat("Delete() Exception: ", ex.Message));
+                resultadoOperacionDelete.OperacionCompletada = false;
+                resultadoOperacionDelete.Origen = "IdentityUserRepository.Delete";
+                resultadoOperacionDelete.Error = ex.Message;
             }
-            return response;
+            return resultadoOperacionDelete;
         }
-        */
-        
-        public async Task<ResultadoOperacion<List<IdentityUser>>> GetAll()
+
+
+        public async Task<ResultadoOperacion<List<CustomIdentityUser>>> GetAll()
         {
             //List<Usuario> usuarios = null;
-            List<IdentityUser> usuariosIdentity = null;
-            ResultadoOperacion<List<IdentityUser>> resultadoOperacionGetAll = new();
+            List<CustomIdentityUser> usuariosIdentity = null;
+            ResultadoOperacion<List<CustomIdentityUser>> resultadoOperacionGetAll = new();
             
             try
             {
@@ -191,10 +207,10 @@ namespace Repository.Repositories
         }
         
         
-        public async Task<ResultadoOperacion<IdentityUser>> GetById(string id)
+        public async Task<ResultadoOperacion<CustomIdentityUser>> GetById(string id)
         {
-            IdentityUser usuario = null;
-            ResultadoOperacion<IdentityUser> resultadoOperacion = new();
+            CustomIdentityUser usuario = null;
+            ResultadoOperacion<CustomIdentityUser> resultadoOperacion = new();
             try
             {
                 usuario = await DBContext.Users.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id);
@@ -224,34 +240,33 @@ namespace Repository.Repositories
 
             return resultadoOperacion;
         }
-
-
-        /*
-        public async Task<int> Update(IdentityUser usuario)
+                
+        public async Task<ResultadoOperacion<int>> Update(CustomIdentityUser usuario)
         {
+            ResultadoOperacion<int> resultUpdateRep = new();
             int response;
             try
             {
 
                 DBContext.Update(usuario);
-                await DBContext.SaveChangesAsync();
-                response = usuario.Id;
+                response = await DBContext.SaveChangesAsync();
+                
+                if (response > 0)               
+                    resultUpdateRep.OperacionCompletada = true;
 
-            }
-            catch (SqlException ex)
-            {
-
-                throw new Exception(string.Concat("IdentityUserRepository.Update(IdentityUser IdentityUser) Exception: ", ex.Message));
-            }
+            }            
             catch (Exception ex)
             {
-
-                throw new Exception(string.Concat("IdentityUserRepository.Update(IdentityUser IdentityUser) Exception: ", ex.Message));
+                resultUpdateRep.OperacionCompletada = false;
+                resultUpdateRep.Error = ex.Message + " | " + ex.InnerException;
+                resultUpdateRep.Origen = "UsuarioRepositiry.Update";
             }
 
-            return response;
+            return resultUpdateRep;
         }
-        */
+
+       
+        
 
         public async Task<ResultadoOperacion<RespuestaAutenticacionDTO>> RegistrarUsuario(CredencialesUsuarioDTO credencialesUsuarioDTO)
         {
@@ -261,7 +276,7 @@ namespace Repository.Repositories
             {
                 //RespuestaAutenticacionDTO respuestaAutenticacion;
                 
-                var usuario = new IdentityUser
+                var usuario = new CustomIdentityUser
                 {
                     UserName = credencialesUsuarioDTO.Email,
                     Email = credencialesUsuarioDTO.Email
@@ -319,6 +334,31 @@ namespace Repository.Repositories
             {
 
                 throw new Exception(string.Concat("IdentityUserRepository.ExisteIdentityUser(int id) Exception: ", ex.Message));
+            }
+
+            return existeusuario;
+        }
+
+        public async Task<bool> ExisteUsuarioById(string id)
+        {
+            bool existeusuario = false;
+            try
+            {
+                //var usuario = await UserManager.FindByIdAsync(id);
+                var usuario = await DBContext.Users.AsNoTracking().FirstOrDefaultAsync(usuario => usuario.Id == id);
+
+                if (usuario is not null)
+                    existeusuario = true;
+            }
+            catch (SqlException ex)
+            {
+
+                throw new Exception(string.Concat("UsuarioRepository.ExisteUsuarioById(string id) Exception: ", ex.Message));
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(string.Concat("UsuarioRepository.ExisteUsuarioById(string id) Exception: ", ex.Message));
             }
 
             return existeusuario;

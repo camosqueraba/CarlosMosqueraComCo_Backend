@@ -22,40 +22,15 @@ namespace API
             // Add services to the container.
 
             services.AddControllers();
-            services.AddDbContext<ApplicationDBContext_SQLServer>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<ApplicationDBContext_SQLServer>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IPublicacionRepository, PublicacionRepository>();
-            services.AddScoped<IPublicacionService, PublicacionService>();
-/*
-            services.AddScoped<ICuentaRepository, CuentaRepository>();
-            services.AddScoped<ICuentaService, CuentaService>();
-
-            services.AddScoped<ITipoCuentaRepository, TipoCuentaRepository>();
-            //services.AddScoped<ITipoCuentaService, TipoCuentaService>();
-
-            services.AddScoped<IEstadoCuentaRepository, EstadoCuentaRepository>();
-            services.AddScoped<IEstadoCuentaService, EstadoCuentaService>();
-
-            services.AddScoped<ITransaccionRepository, TransaccionRepository>();
-            services.AddScoped<ITransaccionService, TransaccionService>();
-
-
-            services.AddScoped<ITipoTransaccionRepository, TipoTransaccionRepository>();
-            services.AddScoped<ITipoTransaccionService, TipoTransaccionService>();
-
-            */
+            //services.AddScoped<IPublicacionRepository, PublicacionRepository>();
+            //services.AddScoped<IPublicacionService, PublicacionService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
 
-
-            services.AddSwaggerGen();
-
-            //services.AddAutoMapper(typeof(Startup));
-            //services.AddAutoMapper(typeof(AutoMapperProfiles));
-
-            //services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDBContext>().AddDefaultTokenProviders();
-
+            services.AddSwaggerGen();     
 
         }
     }

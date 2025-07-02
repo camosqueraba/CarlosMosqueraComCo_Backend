@@ -3,6 +3,7 @@ using DAL.DTOs.ComentarioDTOs;
 using DAL.DTOs.PublicacionDTOs;
 using DAL.DTOs.UsuarioDTOs;
 using DAL.Model;
+using Repository.IdentityEF;
 
 namespace BLL.Utilities
 {
@@ -23,8 +24,10 @@ namespace BLL.Utilities
             CreateMap<UsuarioCreacionDTO, Usuario>();
             //CreateMap<ComentarioEdicionDTO, Comentario>();
             CreateMap<Usuario, UsuarioDTO>();
-            //CreateMap<IdentityUser, UsuarioDTO>();
-            //CreateMap<ComentarioCreacionParaServiceDTO, Comentario>();
+
+            CreateMap<CustomIdentityUser, UsuarioDTO>();
+            CreateMap<CustomIdentityUser, UsuarioDetalleDTO>();
+            CreateMap<UsuarioEdicionDTO, CustomIdentityUser>();
         }
     }
 }

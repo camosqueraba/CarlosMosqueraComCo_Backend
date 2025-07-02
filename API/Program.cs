@@ -1,3 +1,4 @@
+using API.ControllerService;
 using API.Filtros;
 using BLL.Interfaces;
 using BLL.Services;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository.DataContext;
+using Repository.IdentityEF;
 using Repository.Interfaces;
 using Repository.Repositories;
 using Repository.Utils;
@@ -25,6 +27,8 @@ builder.Services.AddControllers(options =>
     options.SuppressModelStateInvalidFilter = true; 
 });
 
+builder.Services.AddScoped<ApiResultFilter>();
+
 var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermitidos")!.Split(",");
 
 
@@ -32,10 +36,9 @@ var origenesPermitidos = builder.Configuration.GetValue<string>("OrigenesPermiti
 builder.Services.AddDbContext<ApplicationDBContext_SQLServer>(opciones =>
 {
     opciones.UseSqlServer("name=SQLServerConnection", migration => migration.MigrationsAssembly("Repository"));
-    //opciones.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
-builder.Services.AddIdentityCore<IdentityUser>()
+builder.Services.AddIdentityCore<CustomIdentityUser>()
                                                 .AddEntityFrameworkStores<ApplicationDBContext_SQLServer>()
                                                 .AddDefaultTokenProviders();
 
@@ -47,14 +50,15 @@ builder.Services.AddScoped<IComentarioService,     ComentarioService>();
 builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioControllerService, UsuarioControllerService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddScoped<IAutorizacionUtilsService, AutorizacionUtilsService>();
 builder.Services.AddScoped<IAutorizacionUtilsRepository, AutorizacionUtilsRepository>();
 
 
-builder.Services.AddScoped<UserManager<IdentityUser>>();
-builder.Services.AddScoped<SignInManager<IdentityUser>>();
+builder.Services.AddScoped<UserManager<CustomIdentityUser>>();
+builder.Services.AddScoped<SignInManager<CustomIdentityUser>>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>
@@ -74,6 +78,15 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen(setup =>
+{
+    setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Api-CarlosMosqueraComCo",
+        Version = "v1"
+    });
+});
+
 
 builder.Services.AddCors(opciones =>
 {
@@ -88,13 +101,32 @@ builder.Services.AddCors(opciones =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+///Creacion de migraciones para produccion
 
+using (var scope = app.Services.CreateScope())
+{
+ var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext_SQLServer>();
+    if (dbContext.Database.IsRelational())
+    {
+        dbContext.Database.Migrate();
+    }
+}
+
+// Configure the HTTP request pipeline.
+/*
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+*/
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api-CarlosMosqueraComCo v1");
+});
+
 
 app.UseHttpsRedirection();
 

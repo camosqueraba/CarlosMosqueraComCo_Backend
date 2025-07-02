@@ -145,7 +145,7 @@ namespace API.Controllers
 
         // DELETE api/<PublicacionesController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResponse_>> Delete(int id)
+        public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
         {
             string titulo = "";
             int status_code = 0;
@@ -157,7 +157,7 @@ namespace API.Controllers
                 titulo = $"registro {id} no encontrado";
                 status_code = 404;
 
-                return NotFound(new ApiResponse_(false, status_code, titulo, null));
+                return NotFound(new ApiResponse<bool>(false, status_code, titulo, false, null));
             }
                            
             ResultadoOperacion<int> resultado = await PublicacionService.Delete(id);
@@ -168,7 +168,7 @@ namespace API.Controllers
                 status_code = 204;
             }
 
-            return Ok(new ApiResponse_(true, status_code, titulo, null));
+            return Ok(new ApiResponse<bool>(true, status_code, titulo, true,null));
         }
     }
 }
