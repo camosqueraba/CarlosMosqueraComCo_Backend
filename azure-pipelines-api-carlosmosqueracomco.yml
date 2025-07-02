@@ -1,0 +1,106 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+#trigger:
+#- master
+
+#pool:
+#  vmImage: 'ubuntu-latest'
+
+#variables:
+#  solution: '**/*.sln'
+#  buildPlatform: 'Any CPU'
+#  buildConfiguration: 'Release'
+
+#steps:
+#- task: NuGetToolInstaller@1
+
+#- task: NuGetCommand@2
+#  inputs:
+#    restoreSolution: '$(solution)'
+
+#- task: VSBuild@1
+#  inputs:
+#    solution: '$(solution)'
+#    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+#    platform: '$(buildPlatform)'
+#    configuration: '$(buildConfiguration)'
+
+#- task: VSTest@2
+#  inputs:
+#    platform: '$(buildPlatform)'
+#    configuration: '$(buildConfiguration)'
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '8.0.x'
+  webAppName: 'Api-CarlosMosqueraComCo'              # Reemplaza con el nombre exacto de tu Azure Web App
+  azureSubscription: 'Suscripcion-Pago-Por-Uso'   # Nombre del Service Connection (Azure Resource Manager)
+  #solution: '**/*.sln'
+  artifactName: 'api-drop'
+
+steps:
+
+# Instalar el SDK de .NET
+- task: UseDotNet@2
+  displayName: 'Instalar el SDK de .NET'
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetVersion)'
+
+# Restaurar paquetes NuGet
+#- task: DotNetCoreCLI@2
+#  displayName: 'Restaurar paquetes NuGet'
+#  inputs:
+#    command: 'restore'
+#    projects: '**/*.csproj'
+
+# Compilar la solución
+- task: DotNetCoreCLI@2
+  displayName: 'Compilar la solución'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+# Publicar salida del proyecto
+- task: DotNetCoreCLI@2
+  displayName: 'Publicar salida del proyecto'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build'
+    zipAfterPublish: true
+
+# Publicar artefacto para la etapa de despliegue
+#- task: PublishBuildArtifacts@1
+#  displayName: 'Publicar artefacto para la etapa de despliegue'
+#  inputs:
+#    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+#    artifactName: '$(artifactName)'
+
+# Desplegar en Azure App Service
+#- task: AzureWebApp@1
+#  displayName: 'Desplegar en Azure App Service'
+#  inputs:
+#    azureSubscription: '$(azureSubscription)'
+#    appType: 'webApp'
+#    appName: '$(webAppName)'
+#    package: '$(Pipeline.Workspace)/$(artifactName)/**/*.zip'
+
+- task: AzureRmWebAppDeployment@5
+  displayName: 'Desplegar en Azure App Service'
+  inputs:
+    ConnectionType: 'AzureRM'
+    appType: 'webAppLinux'
+    WebAppName: 'Api-CarlosMosqueraComCo'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'    
+    DeploymentTypeLinux: 'oneDeploy'
