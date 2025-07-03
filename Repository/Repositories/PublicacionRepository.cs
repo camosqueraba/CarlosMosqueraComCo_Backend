@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repository.DataContext;
 using Repository.Interfaces;
+using System.Data;
 
 namespace Repository.Repositories
 {
@@ -14,6 +15,7 @@ namespace Repository.Repositories
         {
             DBContext = dbContext;
         }
+
         /*
         public async Task<int> Create(Publicacion publicacion)
         {
@@ -40,6 +42,7 @@ namespace Repository.Repositories
             return idPublicacionCreated;
         }
         */
+
         public async Task<ResultadoOperacion<int>> Create(Publicacion publicacion)
         {            
             ResultadoOperacion<int> resultadoOperacionCreate = new();
@@ -132,28 +135,25 @@ namespace Repository.Repositories
             return response;
         }
         */
-        public async Task<List<Publicacion>> GetAll()
+        public async Task<ResultadoOperacion<List<Publicacion>>> GetAll()
         {
-            List<Publicacion> publicacions = null;
-
+            List<Publicacion> publicaciones = null;
+            ResultadoOperacion<List<Publicacion>> resultadoOperacion = new();
+            
             try
             {
-                publicacions = await DBContext.Publicaciones.ToListAsync();
-                //var publicacionsTransform = publicacions.Select(p => new { Publicacion = p, ConteoComentarios = p.Comentarios.Count() });
-            }
-            catch (SqlException ex)
-            {
-
-                throw new Exception(string.Concat("PublicacionRepository.GetAll(Publicacion publicacion) Exception: ", ex.Message));
-            }
+                publicaciones = await DBContext.Publicaciones.ToListAsync();
+                resultadoOperacion.OperacionCompletada = true;
+                resultadoOperacion.DatosResultado = publicaciones;   
+            }            
             catch (Exception ex)
             {
-
-                throw new Exception(string.Concat("PublicacionRepository.GetAll(Publicacion publicacion) Exception: ", ex.Message));
+                resultadoOperacion.OperacionCompletada = false;
+                resultadoOperacion.Error = string.Concat(ex.Message);
+                resultadoOperacion.Origen = "PublicacionRepository.GetAll()";
             }
 
-
-            return publicacions;
+            return resultadoOperacion;
         }
 
         public async Task<ResultadoOperacion<Publicacion>> GetById(int id)

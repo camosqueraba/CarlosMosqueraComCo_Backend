@@ -65,6 +65,13 @@ namespace API.Controllers
 
             return Ok(new ApiResponse<RespuestaAutenticacionDTO>(algo.AutenticacionCorrecta,200 ,algo.MensajeResultado, algo, null));
             
-        } 
+        }
+
+        [HttpGet("saludo")]
+        [AllowAnonymous]
+        public ActionResult Get()
+        {
+            return Ok("Saludos");
+        }
     }
 }

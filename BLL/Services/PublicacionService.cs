@@ -5,6 +5,7 @@ using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Repository.Interfaces;
 using Repository.Repositories;
+using System.Collections.Generic;
 
 namespace BLL.Services
 {
@@ -19,12 +20,32 @@ namespace BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<PublicacionDTO>> GetAll()
+        public async Task<ResultadoOperacion<List<PublicacionDTO>>> GetAll()
         {
+            ResultadoOperacion<List<PublicacionDTO>> resultadoOperacion = new();
 
-            var publicaciones = await PublicacionRepository.GetAll();
-            List<PublicacionDTO> publicacionesDTO = mapper.Map<List<PublicacionDTO>>(publicaciones);
-            return publicacionesDTO;
+            try
+            {
+                var resultGetAllPublicacion = await PublicacionRepository.GetAll();
+
+                resultadoOperacion = mapper.Map<ResultadoOperacion<List<PublicacionDTO>>>(resultGetAllPublicacion);
+                /*
+                if (resultGetAllPublicacion != null && resultGetAllPublicacion.OperacionCompletada)
+                {
+                    List<PublicacionDTO> publicacionesDTO = mapper.Map<List<PublicacionDTO>>(resultGetAllPublicacion.DatosResultado);
+                    resultadoOperacion.DatosResultado = publicacionesDTO;
+                    resultadoOperacion.OperacionCompletada = true;
+                }
+                */
+                //resultadoOperacion.OperacionCompletada = resultGetAllPublicacion.OperacionCompletada;
+            }
+            catch (Exception ex)
+            {
+                resultadoOperacion.Error = string.Concat(ex.Message, " | ", ex.InnerException);
+                resultadoOperacion.Origen = "PublicacionService.GetAll()";
+            }
+            
+            return resultadoOperacion;
         }
 
         public async Task<ResultadoOperacion<PublicacionDetalleDTO>> GetById(int id)

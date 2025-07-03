@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 #archivos sonarqube
 .sonarqube/
+/API/.config
+/API/Properties

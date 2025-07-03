@@ -26,6 +26,9 @@ namespace DAL.DTOs.UtilDTOs
         public static ApiResult<T> Ok(T data, string? message = null)
             => new(true, 200, message ?? "Éxito", data);
 
+        public static ApiResult<T> Created(T data, string? message = null) =>
+            new(true, 201, message ?? "Recurso creado", data);
+
         public static ApiResult<T> NotFound(string message = "No encontrado")
             => new(false, 404, message);
 

@@ -5,7 +5,7 @@ namespace BLL.Interfaces
 {
     public interface IPublicacionService
     {
-        public Task<List<PublicacionDTO>> GetAll();
+        public Task<ResultadoOperacion<List<PublicacionDTO>>> GetAll();
 
         public Task<ResultadoOperacion<PublicacionDetalleDTO>> GetById(int id);
 

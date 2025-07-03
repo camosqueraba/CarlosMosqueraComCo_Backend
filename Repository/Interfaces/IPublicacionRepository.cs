@@ -4,8 +4,8 @@ using DAL.Model;
 namespace Repository.Interfaces
 {
     public interface IPublicacionRepository
-    {        
-        public Task<List<Publicacion>> GetAll();
+    {
+        public Task<ResultadoOperacion<List<Publicacion>>> GetAll();
 
         public Task<ResultadoOperacion<Publicacion>> GetById(int id);
 

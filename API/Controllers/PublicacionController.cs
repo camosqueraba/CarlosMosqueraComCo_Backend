@@ -1,6 +1,8 @@
-﻿using API.Filtros;
+﻿using API.ControllerService;
+using API.Filtros;
 using BLL.Interfaces;
 using DAL.DTOs.PublicacionDTOs;
+using DAL.DTOs.UsuarioDTOs;
 using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -15,45 +17,45 @@ namespace API.Controllers
     [Authorize]
     public class PublicacionController : ControllerBase
     {
-        private readonly IPublicacionService PublicacionService; 
-        public PublicacionController(IPublicacionService publicacionService)
+        private readonly IPublicacionService PublicacionService;
+        private readonly IPublicacionControllerService PublicacionControllerService;
+        public PublicacionController(IPublicacionService publicacionService, IPublicacionControllerService publicacionControllerService)
         {
             PublicacionService = publicacionService;
-        }
-
-        // GET: api/<PublicacionesController>
+            PublicacionControllerService = publicacionControllerService;
+        }   
+        
+        [ServiceFilter(typeof(ApiResultFilter))]
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<PublicacionDTO>>> Get()
-        { 
-            List<PublicacionDTO> publicaciones = await PublicacionService.GetAll();
-
-            string titulo = publicaciones.Count > 0 ? "registros encontrados" : "no se encontraron registros";
-
-            return Ok(new ApiResponse<List<PublicacionDTO>>(true, 200, titulo, publicaciones, null));
+        public async Task<ActionResult<ApiResponse<List<PublicacionDTO>>>> Get()
+        {            
+            return new ObjectResult(await PublicacionControllerService.Get());
         }
-    
 
-        // GET api/<PublicacionesController>/5
-        [HttpGet("{id}", Name = "ObtenetPublicacionPorId")]
-        public async Task<ActionResult<PublicacionDetalleDTO>> Get(int id)
+
+        [ServiceFilter(typeof(ApiResultFilter))]
+        [HttpGet("{id}", Name = "ObtenerPublicacionPorId")]
+        public async Task<ActionResult<ApiResponse<PublicacionDetalleDTO>>> Get(int id)
         {
-            string titulo = "";
-            int status_code = 0;
-            ResultadoOperacion<PublicacionDetalleDTO> resultadoOperacion = null;
-            
-            resultadoOperacion  = await PublicacionService.GetById(id);
-            PublicacionDetalleDTO publicacion = resultadoOperacion.DatosResultado;
+            return new ObjectResult(await PublicacionControllerService.Get(id));
+        }
 
-            if (publicacion is null)
+        //[ServiceFilter(typeof(ApiResultFilter))]
+        [HttpPost]
+        public async Task<ActionResult<ApiResult<PublicacionDetalleDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
+        {
+            var resultCreate = await PublicacionControllerService.Create(publicacionCreacionDTO);
+            //if (resultCreate != null && resultCreate.StatusCode == 201)
+            if (resultCreate is ApiResult<PublicacionDTO> createdResult && createdResult.StatusCode == 201 && createdResult.Data != null)
             {
-                titulo = "registro no encontrado";
-                status_code = 404;
-
-                return NotFound(new ApiResponse<PublicacionDetalleDTO>(true, status_code, titulo, null, null));
-            }            
-
-            return Ok(new ApiResponse<PublicacionDetalleDTO>(true, 200, titulo, publicacion, null));
+                return CreatedAtRoute("ObtenerPublicacionPorId",
+                                        new { id = createdResult.Data.Id },
+                                        createdResult.ToResponse());
+            }
+            //return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
+            return StatusCode(resultCreate.StatusCode, resultCreate.ToResponse());
+            //return new ObjectResult(await PublicacionControllerService.Create(publicacionCreacionDTO));
         }
 
         /*
@@ -78,7 +80,7 @@ namespace API.Controllers
         }
         */
 
-
+        /*
         [HttpPost]
         [ModelStateValidationFilter]
         public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
@@ -108,7 +110,7 @@ namespace API.Controllers
 
             return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
         }
-
+        */
 
         // PUT api/<PublicacionesController>/5
         [HttpPut("{id}")]
@@ -157,7 +159,7 @@ namespace API.Controllers
                 titulo = $"registro {id} no encontrado";
                 status_code = 404;
 
-                return NotFound(new ApiResponse<bool>(false, status_code, titulo, false, null));
+                return NotFound(new ApiResponse<object>(false, status_code, titulo, false, null));
             }
                            
             ResultadoOperacion<int> resultado = await PublicacionService.Delete(id);
