@@ -41,109 +41,30 @@ namespace API.Controllers
             return new ObjectResult(await PublicacionControllerService.Get(id));
         }
 
-        //[ServiceFilter(typeof(ApiResultFilter))]
+
+        /// No se aplica [ServiceFilter(typeof(ApiResultFilter))] para poder generar ruta al recurso creado
         [HttpPost]
         public async Task<ActionResult<ApiResult<PublicacionDetalleDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
         {
             var resultCreate = await PublicacionControllerService.Create(publicacionCreacionDTO);
-            //if (resultCreate != null && resultCreate.StatusCode == 201)
+            
             if (resultCreate is ApiResult<PublicacionDTO> createdResult && createdResult.StatusCode == 201 && createdResult.Data != null)
             {
                 return CreatedAtRoute("ObtenerPublicacionPorId",
                                         new { id = createdResult.Data.Id },
                                         createdResult.ToResponse());
             }
-            //return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
+            
             return StatusCode(resultCreate.StatusCode, resultCreate.ToResponse());
-            //return new ObjectResult(await PublicacionControllerService.Create(publicacionCreacionDTO));
         }
 
-        /*
-        // POST api/<PublicacionesController>        
-        [HttpPost]
-        [ModelStateValidationFilter]
-        public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
-        {
-            PublicacionDTO publicacion = null;
-            
-            if (ModelState.IsValid)
-            {
-                publicacion = await PublicacionService.Create(publicacionCreacionDTO);                
-            }  
-
-            if (publicacion == null)
-            {
-                return BadRequest();
-            }
-            
-            return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
-        }
-        */
-
-        /*
-        [HttpPost]
-        [ModelStateValidationFilter]
-        public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Post([FromBody] PublicacionCreacionDTO publicacionCreacionDTO)
-        {
-            PublicacionDTO publicacion = null;
-            ResultadoOperacion<PublicacionDTO> resultadoOperacionService = null;
-            ApiResponse<PublicacionDTO> apiResponse;
-            
-            if (ModelState.IsValid)
-            {
-                resultadoOperacionService = await PublicacionService.Create(publicacionCreacionDTO);
-            }
-
-            if (resultadoOperacionService != null && resultadoOperacionService.OperacionCompletada == true)
-            {
-                publicacion = resultadoOperacionService.DatosResultado;                
-            }
-
-            if (resultadoOperacionService != null && resultadoOperacionService.OperacionCompletada == false)
-            {
-                List<string> errores = new List<string>();
-                string error_origen = $"{resultadoOperacionService.Origen} : {resultadoOperacionService.Error}";
-                errores.Add(error_origen);
-                apiResponse = new ApiResponse<PublicacionDTO>(false, 400, "error creando recurso", null, errores);
-                return BadRequest(apiResponse);
-            }
-
-            return CreatedAtRoute("ObtenetPublicacionPorId", new { id = publicacion.Id }, new ApiResponse<PublicacionDTO>(true, 201, "recurso creado", publicacion, null));
-        }
-        */
-
-        // PUT api/<PublicacionesController>/5
+        [ServiceFilter(typeof(ApiResultFilter))]
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<PublicacionDTO>>> Put(int id, [FromBody] PublicacionEdicionDTO publicacionEdicion)
+        public async Task<ActionResult<ApiResponse<bool>>> Put(int id, [FromBody] PublicacionEdicionDTO publicacionEdicion)
         {
-            string titulo = "";
-            int status_code = 0;
-
-            PublicacionDetalleDTO publicacionActual;
-            ResultadoOperacion<PublicacionDetalleDTO> resultadoOperacion = await PublicacionService.GetById(id);
-            publicacionActual = resultadoOperacion.DatosResultado;
-            PublicacionDTO publicacionEditada;
-
-            if (publicacionActual is null)
-            {
-                titulo = "registro no encontrado";
-                status_code = 404;
-
-                return NotFound(new ApiResponse<Publicacion>(false, status_code, titulo, null, null));
-            }
-            else
-            {
-                publicacionEdicion.Id = publicacionActual.Id;
-                publicacionEdicion.FechaCreacion = publicacionActual.FechaCreacion;
-                
-                publicacionEditada = await PublicacionService.Update(publicacionEdicion);
-                titulo = "publicacion editada";
-                status_code = 200;
-            }
-
-            return Ok(new ApiResponse<PublicacionDTO>(true, status_code, titulo, publicacionEditada, null));
+            return new ObjectResult(await PublicacionControllerService.Update(id, publicacionEdicion));
         }
-
+        
 
         // DELETE api/<PublicacionesController>/5
         [HttpDelete("{id}")]

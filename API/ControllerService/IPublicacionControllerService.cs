@@ -9,6 +9,6 @@ namespace API.ControllerService
         public Task<IApiResult> Get();
         public Task<IApiResult> Get(int id);
         public Task<IApiResult> Create(PublicacionCreacionDTO publicacionCreacionDTO);
-
+        public Task<IApiResult> Update(int id, PublicacionEdicionDTO publicacionEdicion);
     }
 }

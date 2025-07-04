@@ -14,34 +14,7 @@ namespace Repository.Repositories
         public PublicacionRepository(ApplicationDBContext_SQLServer dbContext)
         {
             DBContext = dbContext;
-        }
-
-        /*
-        public async Task<int> Create(Publicacion publicacion)
-        {
-            int idPublicacionCreated;
-            Oper
-            try
-            {
-                DBContext.Add(publicacion);
-                await DBContext.SaveChangesAsync();
-                idPublicacionCreated = publicacion.Id;
-            }
-            catch (SqlException ex)
-            {
-
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(string.Concat("PublicacionRepository.Create(Publicacion publicacion) Exception: ", ex.Message));
-
-            }
-
-            return idPublicacionCreated;
-        }
-        */
+        }        
 
         public async Task<ResultadoOperacion<int>> Create(Publicacion publicacion)
         {            
@@ -112,29 +85,7 @@ namespace Repository.Repositories
             }
             return resultadoOperacionDelete;
         }
-        
-        /*
-        public async Task<int> Delete(int id)
-        {
-            int response;
-            try
-            {
-                Publicacion publicacion = await DBContext.Publicaciones.FirstAsync(c => c.Id == id);
-
-                DBContext.Remove(publicacion);
-                response = await DBContext.SaveChangesAsync();
-            }
-            catch (SqlException ex)
-            {
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Concat("Delete() Exception: ", ex.Message));
-            }
-            return response;
-        }
-        */
+                
         public async Task<ResultadoOperacion<List<Publicacion>>> GetAll()
         {
             List<Publicacion> publicaciones = null;
@@ -181,30 +132,24 @@ namespace Repository.Repositories
             return resultadoOperacion;
         }
 
-
-        public async Task<int> Update(Publicacion publicacion)
+        public async Task<ResultadoOperacion<bool>> Update(Publicacion publicacion)
         {
-            int response;
+            ResultadoOperacion<bool> result = new();
             try
             {
 
                 DBContext.Update(publicacion);
                 await DBContext.SaveChangesAsync();
-                response = publicacion.Id;
+                result.OperacionCompletada = result.DatosResultado = true;
                 
-            }
-            catch (SqlException ex)
-            {
-
-                throw new Exception(string.Concat("PublicacionRepository.Update(Publicacion publicacion) Exception: ", ex.Message));
-            }
+            }            
             catch (Exception ex)
             {
-
-                throw new Exception(string.Concat("PublicacionRepository.Update(Publicacion publicacion) Exception: ", ex.Message));
+                result.Error = ex.Message;
+                result.Origen = "PublicacionRepository.Update(Publicacion publicacion)";
             }
 
-            return response;
+            return result;
         }
 
 

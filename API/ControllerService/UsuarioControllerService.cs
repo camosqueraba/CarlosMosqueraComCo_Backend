@@ -29,7 +29,7 @@ namespace API.ControllerService
             if(resultUpdate != null && !resultUpdate.OperacionCompletada)
                 return ApiResult<bool>.Error(resultUpdate.Error);
 
-            return ApiResult<object>.NoContent("Recurso actualizado correctamente");
+            return ApiResult<object>.OkWithoutData("Recurso actualizado correctamente");
         }
     }
 }

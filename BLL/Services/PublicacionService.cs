@@ -153,29 +153,34 @@ namespace BLL.Services
             return response;
         }
 
-        public async Task<PublicacionDTO> Update(PublicacionEdicionDTO publicacionEdicionDTO)
+        public async Task<ResultadoOperacion<bool>> Update(PublicacionEdicionDTO publicacionEdicionDTO)
         {
-            int response;
+            ResultadoOperacion<bool> response = new();
             PublicacionDTO publicacionDTO;
+            Publicacion publicacionEditada = null;
             try
-            {                
-                Publicacion publicacion = mapper.Map<Publicacion>(publicacionEdicionDTO);
-                publicacion.FechaModificacion = DateTime.Now;
-
-                response = await PublicacionRepository.Update(publicacion);
-
-                Publicacion publicacionEdited;
-                ResultadoOperacion<Publicacion> resultadoOperacion = await PublicacionRepository.GetById(response);
-                publicacionEdited = resultadoOperacion.DatosResultado;
-                publicacionDTO = mapper.Map<PublicacionDTO>(publicacionEdited);
-            }
-            catch (Exception exception)
             {
+                var resultGetById = await PublicacionRepository.GetById(publicacionEdicionDTO.Id);
+                
+                if (resultGetById != null && resultGetById.OperacionCompletada)
+                {
+                    publicacionEditada = resultGetById.DatosResultado;
 
-                throw new Exception(string.Concat("PublicacionService.Update(PublicacionEdicionDTO publicacionEdicionDTO) Exception: ", exception.Message));
+                    publicacionEditada.Titulo = publicacionEdicionDTO.Titulo;
+                    publicacionEditada.Contenido = publicacionEdicionDTO.Contenido;
+                    publicacionEditada.FechaModificacion = DateTime.Now;
+
+                    response = await PublicacionRepository.Update(publicacionEditada);
+                }        
+                
+            }
+            catch (Exception ex)
+            {   
+                response.Error = ex.Message;
+                response.Origen = "PublicacionService.Update(PublicacionEdicionDTO publicacionEdicionDTO)";
             }
 
-            return publicacionDTO;
+            return response;
         }
 
         public async Task<bool> ExistePublicacion(int id)

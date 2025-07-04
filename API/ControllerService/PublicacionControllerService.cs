@@ -77,5 +77,23 @@ namespace API.ControllerService
 
             return ApiResult<PublicacionDTO>.Created(resultCreate.DatosResultado, "Recurso creado");
         }
+
+        public async Task<IApiResult> Update(int id, PublicacionEdicionDTO publicacionEdicion)
+        {
+            bool existePublicacion = await PublicacionService.ExistePublicacion(id);
+
+            if (!existePublicacion)
+                return ApiResult<bool>.NotFound($"{id} no encontrado");
+
+            if (existePublicacion && (id != publicacionEdicion.Id))
+                return ApiResult<bool>.BadRequest();
+
+            var resultUpdate = await PublicacionService.Update(publicacionEdicion);
+
+            if (resultUpdate != null && !resultUpdate.OperacionCompletada)
+                return ApiResult<bool>.Error(resultUpdate.Error);
+
+            return ApiResult<object>.OkWithoutData("Recurso actualizado correctamente");
+        }
     }
 }
