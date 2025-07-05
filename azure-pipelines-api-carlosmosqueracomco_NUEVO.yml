@@ -45,6 +45,7 @@ steps:
     azureSubscription: 'Suscripcion-Pago-Por-Uso(c3f68876-32b0-4e88-9828-467bda26be05)'
     command: 'publish'
     publishWebProjects: true
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 - task: AzureRmWebAppDeployment@5
   displayName: 'Despliegue'
