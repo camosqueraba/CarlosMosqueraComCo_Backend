@@ -15,24 +15,39 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-  displayName: 'Instalar paquete Nuget'
+#- task: NuGetToolInstaller@1
+#  displayName: 'Instalar paquete Nuget'
 
-- task: NuGetCommand@2
-  displayName: 'Restaurar solucion'
-  inputs:
-    restoreSolution: '$(solution)'
+#- task: NuGetCommand@2
+#  displayName: 'Restaurar solucion'
+#  inputs:
+#    restoreSolution: '$(solution)'
 
-- task: VSBuild@1
-  displayName: 'Compilar solucion'
+#- task: VSBuild@1
+#  displayName: 'Compilar solucion'
+#  inputs:
+#    solution: '$(solution)'
+#    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+#    platform: '$(buildPlatform)'
+#    configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Compilar'
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    azureSubscription: 'Suscripcion-Pago-Por-Uso(c3f68876-32b0-4e88-9828-467bda26be05)'
+    command: 'build'
+    projects: '**/*.sln'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publicar'
+  inputs:
+    azureSubscription: 'Suscripcion-Pago-Por-Uso(c3f68876-32b0-4e88-9828-467bda26be05)'
+    command: 'publish'
+    publishWebProjects: true
 
 - task: AzureRmWebAppDeployment@5
-  displayName: 'Despliegue solucion'
+  displayName: 'Despliegue'
   inputs:
     ConnectionType: 'AzureRM'
     appType: 'webAppLinux'
