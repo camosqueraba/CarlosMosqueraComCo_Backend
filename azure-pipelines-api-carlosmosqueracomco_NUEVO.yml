@@ -50,6 +50,7 @@ steps:
   displayName: 'Despliegue'
   inputs:
     ConnectionType: 'AzureRM'
+    azureSubscription: 'Suscripcion-Pago-Por-Uso(c3f68876-32b0-4e88-9828-467bda26be05)'
     appType: 'webAppLinux'
     WebAppName: 'Api-CarlosMosqueraComCo'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
