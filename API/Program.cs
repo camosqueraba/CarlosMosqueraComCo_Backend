@@ -101,8 +101,8 @@ builder.Services.AddCors(opciones =>
 
 var app = builder.Build();
 
-///Creacion de migraciones para produccion
-
+///Creacion de migraciones para produccion, NO SE USA PORQUE LA BD YA SE CREO EN AZURE
+/*
 using (var scope = app.Services.CreateScope())
 {
  var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext_SQLServer>();
@@ -111,6 +111,7 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.Migrate();
     }
 }
+*/
 
 // Configure the HTTP request pipeline.
 /*
@@ -137,3 +138,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
