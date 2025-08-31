@@ -76,13 +76,6 @@ namespace Repository.Utils
 
             return resultadoValidarPassword;
         }
-        /*
-        public async Task<SignInResult> CheckPasswordIdentity(CredencialesUsuarioDTO credencialesUsuarioDTO)
-        {
-            var usuario = await UserManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
-            var resultado = await _SignInManager.CheckPasswordSignInAsync(usuario, credencialesUsuarioDTO.Password!, lockoutOnFailure: false);
-            return resultado;
-        }
-        */
+        
     }
 }

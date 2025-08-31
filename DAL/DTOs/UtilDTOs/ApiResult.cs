@@ -26,23 +26,23 @@ namespace DAL.DTOs.UtilDTOs
         public static ApiResult<T> Ok(T data, string? message = null)
             => new(true, 200, message ?? "Éxito", data);
 
+        public static ApiResult<T> Created(T data, string? message = null) =>
+            new(true, 201, message ?? "Recurso creado", data);
+
         public static ApiResult<T> NotFound(string message = "No encontrado")
             => new(false, 404, message);
 
-        public static ApiResult<T> BadRequest(string message = "Petición inválida")
+        public static ApiResult<T> BadRequest(string message = "Petición no válida")
             => new(false, 400, message);
 
         public static ApiResult<T> Unauthorized(string message = "No autorizado") =>
         new(false, 401, message, default);
 
         public static ApiResult<T> Error(string errores, string message = "Error interno", int statusCode = 500) =>
-            new(false, statusCode, message, default, errores);
+            new(false, statusCode, message, default, errores);               
 
-        public static ApiResult<T> Empty(string? message = null) =>
-            new(true, 200, message ?? "Sin contenido", default);
-
-        public static ApiResult<T> NoContent(string? message = null) =>
-           new(true, 204, message ?? "Sin contenido", default);
+        public static ApiResult<T> OkWithoutData(string? message = null) =>
+           new(true, 200, message ?? "Sin contenido", default);
 
         public ApiResponseCustom ToResponse() => new ApiResponseCustom
         {

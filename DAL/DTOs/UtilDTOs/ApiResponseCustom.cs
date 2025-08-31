@@ -14,7 +14,7 @@ namespace DAL.DTOs.UtilDTOs
         public object? Data { get; init; }
         public string ErrorMessage { get; init; } = string.Empty;
 
-        /*
+        
         public static ApiResponseCustom SuccessResponse(object? data, int statusCode = 200, string? message = null) =>
             new()
             {
@@ -33,6 +33,6 @@ namespace DAL.DTOs.UtilDTOs
                 Data = null
             };
 
-        */
+        
     }
 }

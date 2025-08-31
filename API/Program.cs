@@ -43,17 +43,19 @@ builder.Services.AddIdentityCore<CustomIdentityUser>()
                                                 .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
-builder.Services.AddScoped<IPublicacionService,    PublicacionService>();
-builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
+
+builder.Services.AddScoped<IPublicacionControllerService,   PublicacionControllerService>();
+builder.Services.AddScoped<IPublicacionService,             PublicacionService>();
+builder.Services.AddScoped<IPublicacionRepository,          PublicacionRepository>();
 
 builder.Services.AddScoped<IComentarioService,     ComentarioService>();
 builder.Services.AddScoped<IComentarioRepository,  ComentarioRepository>();
 
-builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-builder.Services.AddScoped<IUsuarioControllerService, UsuarioControllerService>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioControllerService,   UsuarioControllerService>();
+builder.Services.AddScoped<IUsuarioService,             UsuarioService>();
+builder.Services.AddScoped<IUsuarioRepository,          UsuarioRepository>();
 
-builder.Services.AddScoped<IAutorizacionUtilsService, AutorizacionUtilsService>();
+builder.Services.AddScoped<IAutorizacionUtilsService,    AutorizacionUtilsService>();
 builder.Services.AddScoped<IAutorizacionUtilsRepository, AutorizacionUtilsRepository>();
 
 
@@ -78,6 +80,7 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.ConfigureSwaggerGen(setup =>
 {
     setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -138,5 +141,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-

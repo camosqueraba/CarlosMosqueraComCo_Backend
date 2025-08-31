@@ -5,6 +5,7 @@ using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Repository.Interfaces;
 using Repository.Repositories;
+using System.Collections.Generic;
 
 namespace BLL.Services
 {
@@ -19,12 +20,32 @@ namespace BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<PublicacionDTO>> GetAll()
+        public async Task<ResultadoOperacion<List<PublicacionDTO>>> GetAll()
         {
+            ResultadoOperacion<List<PublicacionDTO>> resultadoOperacion = new();
 
-            var publicaciones = await PublicacionRepository.GetAll();
-            List<PublicacionDTO> publicacionesDTO = mapper.Map<List<PublicacionDTO>>(publicaciones);
-            return publicacionesDTO;
+            try
+            {
+                var resultGetAllPublicacion = await PublicacionRepository.GetAll();
+
+                resultadoOperacion = mapper.Map<ResultadoOperacion<List<PublicacionDTO>>>(resultGetAllPublicacion);
+                /*
+                if (resultGetAllPublicacion != null && resultGetAllPublicacion.OperacionCompletada)
+                {
+                    List<PublicacionDTO> publicacionesDTO = mapper.Map<List<PublicacionDTO>>(resultGetAllPublicacion.DatosResultado);
+                    resultadoOperacion.DatosResultado = publicacionesDTO;
+                    resultadoOperacion.OperacionCompletada = true;
+                }
+                */
+                //resultadoOperacion.OperacionCompletada = resultGetAllPublicacion.OperacionCompletada;
+            }
+            catch (Exception ex)
+            {
+                resultadoOperacion.Error = string.Concat(ex.Message, " | ", ex.InnerException);
+                resultadoOperacion.Origen = "PublicacionService.GetAll()";
+            }
+            
+            return resultadoOperacion;
         }
 
         public async Task<ResultadoOperacion<PublicacionDetalleDTO>> GetById(int id)
@@ -132,29 +153,34 @@ namespace BLL.Services
             return response;
         }
 
-        public async Task<PublicacionDTO> Update(PublicacionEdicionDTO publicacionEdicionDTO)
+        public async Task<ResultadoOperacion<bool>> Update(PublicacionEdicionDTO publicacionEdicionDTO)
         {
-            int response;
+            ResultadoOperacion<bool> response = new();
             PublicacionDTO publicacionDTO;
+            Publicacion publicacionEditada = null;
             try
-            {                
-                Publicacion publicacion = mapper.Map<Publicacion>(publicacionEdicionDTO);
-                publicacion.FechaModificacion = DateTime.Now;
-
-                response = await PublicacionRepository.Update(publicacion);
-
-                Publicacion publicacionEdited;
-                ResultadoOperacion<Publicacion> resultadoOperacion = await PublicacionRepository.GetById(response);
-                publicacionEdited = resultadoOperacion.DatosResultado;
-                publicacionDTO = mapper.Map<PublicacionDTO>(publicacionEdited);
-            }
-            catch (Exception exception)
             {
+                var resultGetById = await PublicacionRepository.GetById(publicacionEdicionDTO.Id);
+                
+                if (resultGetById != null && resultGetById.OperacionCompletada)
+                {
+                    publicacionEditada = resultGetById.DatosResultado;
 
-                throw new Exception(string.Concat("PublicacionService.Update(PublicacionEdicionDTO publicacionEdicionDTO) Exception: ", exception.Message));
+                    publicacionEditada.Titulo = publicacionEdicionDTO.Titulo;
+                    publicacionEditada.Contenido = publicacionEdicionDTO.Contenido;
+                    publicacionEditada.FechaModificacion = DateTime.Now;
+
+                    response = await PublicacionRepository.Update(publicacionEditada);
+                }        
+                
+            }
+            catch (Exception ex)
+            {   
+                response.Error = ex.Message;
+                response.Origen = "PublicacionService.Update(PublicacionEdicionDTO publicacionEdicionDTO)";
             }
 
-            return publicacionDTO;
+            return response;
         }
 
         public async Task<bool> ExistePublicacion(int id)

@@ -2,6 +2,7 @@
 using DAL.DTOs.ComentarioDTOs;
 using DAL.DTOs.PublicacionDTOs;
 using DAL.DTOs.UsuarioDTOs;
+using DAL.DTOs.UtilDTOs;
 using DAL.Model;
 using Repository.IdentityEF;
 
@@ -28,6 +29,8 @@ namespace BLL.Utilities
             CreateMap<CustomIdentityUser, UsuarioDTO>();
             CreateMap<CustomIdentityUser, UsuarioDetalleDTO>();
             CreateMap<UsuarioEdicionDTO, CustomIdentityUser>();
+
+            CreateMap<ResultadoOperacion<List<Publicacion>>, ResultadoOperacion<List<PublicacionDTO>>>();
         }
     }
 }
